@@ -1,0 +1,1 @@
+"""Public plugin contracts."""

@@ -1,0 +1,36 @@
+{
+  "schema_version": "1.0",
+  "tool": "scripts/verify_interactive_startup.ps1",
+  "generated_at_utc": "2026-08-09T06:16:36.8761662Z",
+  "execution": "current interactive Windows desktop; not a clean-machine run",
+  "artifact": {
+    "path": "QuillForge.exe",
+    "resolved_path": "D:\\Workplace\\Agent_Workplace\\QuillForge\\QuillForge.exe",
+    "sha256": "A0B4F173C058542FE744095EA89551DBBBF8E817E24F227136A31F357C0F5648"
+  },
+  "environment": {
+    "os": "Microsoft Windows 11 专业版",
+    "os_version": "10.0.26100",
+    "architecture": "x64-based PC"
+  },
+  "startup": {
+    "threshold_seconds": 5,
+    "elapsed_seconds": 5.139,
+    "process_exact_path_verified": true,
+    "window": {
+      "app": "process:D:\\Workplace\\Agent_Workplace\\QuillForge\\QuillForge.exe",
+      "title": "QuillForge",
+      "window_id": 2040504
+    },
+    "cleanup_exact_path_processes": true
+  },
+  "interpretation": {
+    "result": "current-machine-interactive-startup-passed",
+    "clean_machine": false,
+    "unrun": [
+      "clean Windows x64 desktop startup",
+      "cross-machine repeatability",
+      "interactive feature matrix beyond startup identity"
+    ]
+  }
+}

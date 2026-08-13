@@ -1,0 +1,3480 @@
+{
+  "schema_version": "1.0",
+  "project": "QuillForge",
+  "owner": "architect",
+  "latest_id": "2026-08-12-d315-readable-checkbox-indicator",
+  "latest_path": "docs/handoffs/2026-08-12-d315-readable-checkbox-indicator/handoff.md",
+  "entries": [
+    {
+      "id": "2026-08-12-d315-readable-checkbox-indicator",
+      "path": "docs/handoffs/2026-08-12-d315-readable-checkbox-indicator/handoff.md",
+      "delivery": "D315 / UI-133 / ARCH-285 Readable checkbox indicator states",
+      "status": "accepted-with-limits",
+      "owner": "architect",
+      "created_at": "2026-08-13T00:20:00+08:00",
+      "acceptance_ids": ["S355"]
+    },
+    {
+      "id": "2026-08-12-d314-theme-aware-combo-expanded",
+      "path": "docs/handoffs/2026-08-12-d314-theme-aware-combo-expanded/handoff.md",
+      "delivery": "D314 / UI-132 / ARCH-284 Theme-aware combo-box expanded affordance",
+      "status": "accepted-with-limits",
+      "owner": "architect",
+      "created_at": "2026-08-13T00:05:00+08:00",
+      "acceptance_ids": ["S354"]
+    },
+    {
+      "id": "2026-08-12-d313-theme-aware-typography-steppers",
+      "path": "docs/handoffs/2026-08-12-d313-theme-aware-typography-steppers/handoff.md",
+      "delivery": "D313 / UI-131 / ARCH-283 Theme-aware typography steppers",
+      "status": "accepted-with-limits",
+      "owner": "architect",
+      "created_at": "2026-08-12T23:59:00+08:00",
+      "acceptance_ids": ["S353"]
+    },
+    {
+      "id": "2026-08-12-d312-theme-aware-scrollbars",
+      "path": "docs/handoffs/2026-08-12-d312-theme-aware-scrollbars/handoff.md",
+      "delivery": "D312 / UI-130 / ARCH-282 Theme-aware scrollbars",
+      "status": "accepted-with-limits",
+      "owner": "architect",
+      "created_at": "2026-08-12T23:59:00+08:00",
+      "acceptance_ids": ["S352"]
+    },
+    {
+      "id": "2026-08-12-d311-theme-aware-shell-separators",
+      "path": "docs/handoffs/2026-08-12-d311-theme-aware-shell-separators/handoff.md",
+      "delivery": "D311 / UI-129 / ARCH-281 Theme-aware shell separators",
+      "status": "accepted-with-limits",
+      "owner": "architect",
+      "created_at": "2026-08-12T23:59:00+08:00",
+      "acceptance_ids": ["S351"]
+    },
+    {
+      "id": "2026-08-12-d310-safe-startup-recovery",
+      "path": "docs/handoffs/2026-08-12-d310-safe-startup-recovery/handoff.md",
+      "delivery": "D310 / ARCH-280 Safe startup recovery path",
+      "status": "accepted-with-limits",
+      "owner": "architect",
+      "created_at": "2026-08-12T23:55:00+08:00",
+      "acceptance_ids": ["S350"]
+    },
+    {
+      "id": "2026-08-12-d309-themed-tooltip-surface",
+      "path": "docs/handoffs/2026-08-12-d309-themed-tooltip-surface/handoff.md",
+      "delivery": "D309 / UI-128 / ARCH-279 Theme-aware Tooltip surface",
+      "status": "accepted-with-limits",
+      "owner": "architect",
+      "created_at": "2026-08-12T23:50:00+08:00",
+      "acceptance_ids": ["S349"]
+    },
+    {
+      "id": "2026-08-12-d308-workspace-open-affordance",
+      "path": "docs/handoffs/2026-08-12-d308-workspace-open-affordance/handoff.md",
+      "delivery": "D308 / UI-127 / ARCH-278 Workspace open-action affordance",
+      "status": "accepted-with-limits",
+      "owner": "architect",
+      "created_at": "2026-08-12T23:30:00+08:00",
+      "acceptance_ids": ["S348"]
+    },
+    {
+      "id": "2026-08-12-d307-settings-draft-status",
+      "path": "docs/handoffs/2026-08-12-d307-settings-draft-status/handoff.md",
+      "delivery": "D307 / UI-126 / ARCH-277 Settings unsaved-draft status",
+      "status": "accepted-with-limits",
+      "owner": "architect",
+      "created_at": "2026-08-12T23:00:00+08:00",
+      "acceptance_ids": ["S347"]
+    },
+    {
+      "id": "2026-08-12-d306-settings-restore-defaults",
+      "path": "docs/handoffs/2026-08-12-d306-settings-restore-defaults/handoff.md",
+      "delivery": "D306 / UI-125 / ARCH-276 Settings draft restore defaults",
+      "status": "accepted-with-limits",
+      "owner": "architect",
+      "created_at": "2026-08-12T22:00:00+08:00",
+      "acceptance_ids": ["S346"]
+    },
+    {
+      "id": "2026-08-13-d305-settings-accessible-names",
+      "path": "docs/handoffs/2026-08-13-d305-settings-accessible-names/handoff.md",
+      "delivery": "D305 / UI-124 / ARCH-275 Localized Settings accessible names",
+      "status": "accepted-with-limits",
+      "owner": "architect",
+      "created_at": "2026-08-13T10:30:00+08:00",
+      "acceptance_ids": ["S345"]
+    },
+    {
+      "id": "2026-08-13-d304-locale-choice-role",
+      "path": "docs/handoffs/2026-08-13-d304-locale-choice-role/handoff.md",
+      "delivery": "D304 / UI-123 / ARCH-274 Locale choice role",
+      "status": "accepted-with-limits",
+      "owner": "architect",
+      "created_at": "2026-08-13T09:30:00+08:00",
+      "acceptance_ids": ["S344"]
+    },
+    {
+      "id": "2026-08-13-d303-behavior-toggle-role",
+      "path": "docs/handoffs/2026-08-13-d303-behavior-toggle-role/handoff.md",
+      "delivery": "D303 / UI-122 / ARCH-273 Behavior toggle role",
+      "status": "accepted-with-limits",
+      "owner": "architect",
+      "created_at": "2026-08-13T08:30:00+08:00",
+      "acceptance_ids": ["S343"]
+    },
+    {
+      "id": "2026-08-13-d302-typography-choice-role",
+      "path": "docs/handoffs/2026-08-13-d302-typography-choice-role/handoff.md",
+      "delivery": "D302 / UI-121 / ARCH-272 Typography choice role",
+      "status": "accepted-with-limits",
+      "owner": "architect",
+      "created_at": "2026-08-13T07:30:00+08:00",
+      "acceptance_ids": ["S342"]
+    },
+    {
+      "id": "2026-08-13-d301-semantic-settings-choice-role",
+      "path": "docs/handoffs/2026-08-13-d301-semantic-settings-choice-role/handoff.md",
+      "delivery": "D301 / UI-120 / ARCH-271 Semantic Settings choice role",
+      "status": "accepted-with-limits",
+      "owner": "architect",
+      "created_at": "2026-08-13T06:30:00+08:00",
+      "acceptance_ids": ["S341"]
+    },
+    {
+      "id": "2026-08-13-d300-settings-choice-hierarchy",
+      "path": "docs/handoffs/2026-08-13-d300-settings-choice-hierarchy/handoff.md",
+      "delivery": "D300 / UI-119 / ARCH-270 Settings choice hierarchy",
+      "status": "accepted-with-limits",
+      "owner": "architect",
+      "created_at": "2026-08-13T05:30:00+08:00",
+      "acceptance_ids": ["S340"]
+    },
+    {
+      "id": "2026-08-13-d299-frozen-qt-plugin-root-selection",
+      "path": "docs/handoffs/2026-08-13-d299-frozen-qt-plugin-root-selection/handoff.md",
+      "delivery": "D299 / ARCH-269 Frozen Qt plugin root selection",
+      "status": "accepted-with-limits",
+      "owner": "architect",
+      "created_at": "2026-08-13T04:30:00+08:00",
+      "acceptance_ids": ["S339"]
+    },
+    {
+      "id": "2026-08-13-d298-frozen-qt-layout-fallback",
+      "path": "docs/handoffs/2026-08-13-d298-frozen-qt-layout-fallback/handoff.md",
+      "delivery": "D298 / ARCH-268 Frozen Qt layout fallback",
+      "status": "accepted-with-limits",
+      "owner": "architect",
+      "created_at": "2026-08-13T03:30:00+08:00",
+      "acceptance_ids": ["S338"]
+    },
+    {
+      "id": "2026-08-13-d297-frozen-qt-runtime-preflight",
+      "path": "docs/handoffs/2026-08-13-d297-frozen-qt-runtime-preflight/handoff.md",
+      "delivery": "D297 / ARCH-267 Frozen Qt runtime preflight",
+      "status": "accepted-with-limits",
+      "owner": "architect",
+      "created_at": "2026-08-13T02:30:00+08:00",
+      "acceptance_ids": ["S337"]
+    },
+    {
+      "id": "2026-08-13-d296-frozen-qt-plugin-path",
+      "path": "docs/handoffs/2026-08-13-d296-frozen-qt-plugin-path/handoff.md",
+      "delivery": "D296 / ARCH-266 Frozen Qt plugin path binding",
+      "status": "accepted-with-limits",
+      "owner": "architect",
+      "created_at": "2026-08-13T01:30:00+08:00",
+      "acceptance_ids": ["S336"]
+    },
+    {
+      "id": "2026-08-12-d295-task-runner-abnormal-termination",
+      "path": "docs/handoffs/2026-08-12-d295-task-runner-abnormal-termination/handoff.md",
+      "delivery": "D295 / ARCH-265 TaskRunner abnormal termination boundary",
+      "status": "accepted-with-limits",
+      "owner": "architect",
+      "created_at": "2026-08-13T00:30:00+08:00",
+      "acceptance_ids": ["S335"]
+    },
+    {
+      "id": "2026-08-12-d294-startup-diagnostic-qt-lifecycle",
+      "path": "docs/handoffs/2026-08-12-d294-startup-diagnostic-qt-lifecycle/handoff.md",
+      "delivery": "D294 / ARCH-264 Startup diagnostic QApplication lifecycle",
+      "status": "accepted-with-limits",
+      "owner": "architect",
+      "created_at": "2026-08-12T23:55:00+08:00",
+      "acceptance_ids": ["S334"]
+    },
+    {
+      "id": "2026-08-12-d293-task-runner-submit-rollback",
+      "path": "docs/handoffs/2026-08-12-d293-task-runner-submit-rollback/handoff.md",
+      "delivery": "D293 / ARCH-263 TaskRunner submission rollback boundary",
+      "status": "accepted-with-limits",
+      "owner": "architect",
+      "created_at": "2026-08-12T23:30:00+08:00",
+      "acceptance_ids": ["S333"]
+    },
+    {
+      "id": "2026-08-12-d292-runtime-shutdown-activity-boundary",
+      "path": "docs/handoffs/2026-08-12-d292-runtime-shutdown-activity-boundary/handoff.md",
+      "delivery": "D292 / ARCH-262 Runtime shutdown activity boundary",
+      "status": "accepted-with-limits",
+      "owner": "architect",
+      "created_at": "2026-08-12T23:00:00+08:00",
+      "acceptance_ids": ["S332"]
+    },
+    {
+      "id": "2026-08-12-d291-entrypoint-runtime-cleanup",
+      "path": "docs/handoffs/2026-08-12-d291-entrypoint-runtime-cleanup/handoff.md",
+      "delivery": "D291 / ARCH-261 Entrypoint runtime cleanup",
+      "status": "accepted-with-limits",
+      "owner": "architect",
+      "created_at": "2026-08-12T22:00:00+08:00",
+      "acceptance_ids": ["S331"]
+    },
+    {
+      "id": "2026-08-12-d290-startup-preflight-wait-refinement",
+      "path": "docs/handoffs/2026-08-12-d290-startup-preflight-wait-refinement/handoff.md",
+      "delivery": "D290 / ARCH-260 Startup preflight wait refinement",
+      "status": "accepted-with-limits",
+      "owner": "architect",
+      "created_at": "2026-08-12T21:00:00+08:00",
+      "acceptance_ids": ["S330"]
+    },
+    {
+      "id": "2026-08-12-d289-file-open-preflight",
+      "path": "docs/handoffs/2026-08-12-d289-file-open-preflight/handoff.md",
+      "delivery": "D289 / ARCH-259 File-open preflight",
+      "status": "accepted-with-limits",
+      "owner": "architect",
+      "created_at": "2026-08-12T20:00:00+08:00",
+      "acceptance_ids": ["S329"]
+    },
+    {
+      "id": "2026-08-12-d288-startup-restore-preflight",
+      "path": "docs/handoffs/2026-08-12-d288-startup-restore-preflight/handoff.md",
+      "delivery": "D288 / ARCH-258 Startup restore preflight",
+      "status": "accepted-with-limits",
+      "owner": "architect",
+      "created_at": "2026-08-12T18:30:00+08:00",
+      "acceptance_ids": ["S328"]
+    },
+    {
+      "id": "2026-08-12-d287-startup-state-preflight",
+      "path": "docs/handoffs/2026-08-12-d287-startup-state-preflight/handoff.md",
+      "delivery": "D287 / ARCH-257 Startup state preflight",
+      "status": "accepted-with-limits",
+      "owner": "architect",
+      "created_at": "2026-08-12T17:20:00+08:00",
+      "acceptance_ids": ["S327"]
+    },
+    {
+      "id": "2026-08-12-d286-editor-shell-preflight",
+      "path": "docs/handoffs/2026-08-12-d286-editor-shell-preflight/handoff.md",
+      "delivery": "D286 / ARCH-256 Editor-shell startup preflight",
+      "status": "accepted-with-limits",
+      "owner": "architect",
+      "created_at": "2026-08-12T16:20:00+08:00",
+      "acceptance_ids": ["S326"]
+    },
+    {
+      "id": "2026-08-12-d285-startup-preparation",
+      "path": "docs/handoffs/2026-08-12-d285-startup-preparation/handoff.md",
+      "delivery": "D285 / ARCH-255 Startup preparation preflight",
+      "status": "accepted-with-limits",
+      "owner": "architect",
+      "created_at": "2026-08-12T15:55:00+08:00",
+      "acceptance_ids": ["S325"]
+    },
+    {
+      "id": "2026-08-12-d284-startup-runtime-composition",
+      "path": "docs/handoffs/2026-08-12-d284-startup-runtime-composition/handoff.md",
+      "delivery": "D284 / ARCH-254 Startup runtime-composition preflight",
+      "status": "accepted-with-limits",
+      "owner": "architect",
+      "created_at": "2026-08-12T15:35:00+08:00",
+      "acceptance_ids": ["S324"]
+    },
+    {
+      "id": "2026-08-12-d283-startup-error-log-lifecycle",
+      "path": "docs/handoffs/2026-08-12-d283-startup-error-log-lifecycle/handoff.md",
+      "delivery": "D283 / ARCH-253 Startup-error log lifecycle",
+      "status": "accepted-with-limits",
+      "owner": "architect",
+      "created_at": "2026-08-12T15:15:00+08:00",
+      "acceptance_ids": ["S323"]
+    },
+    {
+      "id": "2026-08-12-d282-main-window-startup-state",
+      "path": "docs/handoffs/2026-08-12-d282-main-window-startup-state/handoff.md",
+      "delivery": "D282 / ARCH-252 MainWindow startup-state initialization",
+      "status": "accepted-with-limits",
+      "owner": "architect",
+      "created_at": "2026-08-12T14:55:00+08:00",
+      "acceptance_ids": ["S322"]
+    },
+    {
+      "id": "2026-08-12-d281-startup-diagnostic-user-guidance",
+      "path": "docs/handoffs/2026-08-12-d281-startup-diagnostic-user-guidance/handoff.md",
+      "delivery": "D281 / ARCH-251 Startup diagnostic user guidance",
+      "status": "accepted-with-limits",
+      "owner": "architect",
+      "created_at": "2026-08-12T14:40:00+08:00",
+      "acceptance_ids": ["S321"]
+    },
+    {
+      "id": "2026-08-12-d280-startup-settings-preflight",
+      "path": "docs/handoffs/2026-08-12-d280-startup-settings-preflight/handoff.md",
+      "delivery": "D280 / ARCH-250 Startup settings preflight",
+      "status": "accepted-with-limits",
+      "owner": "architect",
+      "created_at": "2026-08-12T14:25:00+08:00",
+      "acceptance_ids": ["S320"]
+    },
+    {
+      "id": "2026-08-12-d279-font-availability-status",
+      "path": "docs/handoffs/2026-08-12-d279-font-availability-status/handoff.md",
+      "delivery": "D279 / ARCH-249 Font availability status projection",
+      "status": "accepted-with-limits",
+      "owner": "architect",
+      "created_at": "2026-08-12T14:15:00+08:00",
+      "acceptance_ids": ["S319"]
+    },
+    {
+      "id": "2026-08-12-d278-command-surface-startup-contract",
+      "path": "docs/handoffs/2026-08-12-d278-command-surface-startup-contract/handoff.md",
+      "delivery": "D278 / ARCH-248 Command-surface startup contract",
+      "status": "accepted-with-limits",
+      "owner": "architect",
+      "created_at": "2026-08-12T13:45:00+08:00",
+      "acceptance_ids": ["S318"]
+    },
+    {
+      "id": "2026-08-12-d277-settings-typography-contract",
+      "path": "docs/handoffs/2026-08-12-d277-settings-typography-contract/handoff.md",
+      "delivery": "D277 / ARCH-247 Settings typography contract audit",
+      "status": "accepted-with-limits",
+      "owner": "architect",
+      "created_at": "2026-08-12T13:50:00+08:00",
+      "acceptance_ids": ["S317"]
+    },
+    {
+      "id": "2026-08-12-d276-workspace-file-open-contract",
+      "path": "docs/handoffs/2026-08-12-d276-workspace-file-open-contract/handoff.md",
+      "delivery": "D276 / ARCH-246 Workspace file-open contract audit",
+      "status": "accepted-with-limits",
+      "owner": "architect",
+      "created_at": "2026-08-12T13:35:00+08:00",
+      "acceptance_ids": ["S316"]
+    },
+    {
+      "id": "2026-08-12-d275-qss-semantic-contrast-contract",
+      "path": "docs/handoffs/2026-08-12-d275-qss-semantic-contrast-contract/handoff.md",
+      "delivery": "D275 / ARCH-245 QSS semantic contrast contract",
+      "status": "accepted-with-limits",
+      "owner": "architect",
+      "created_at": "2026-08-12T13:20:00+08:00",
+      "acceptance_ids": ["S315"]
+    },
+    {
+      "id": "2026-08-12-d273-theme-contrast-audit",
+      "path": "docs/handoffs/2026-08-12-d273-theme-contrast-audit/handoff.md",
+      "delivery": "D273 / ARCH-244 Theme contrast regression audit",
+      "status": "accepted-with-limits",
+      "owner": "architect",
+      "created_at": "2026-08-12T12:55:18+08:00",
+      "acceptance_ids": ["S314"]
+    },
+    {
+      "id": "2026-08-12-d270-static-notification-localization-audit",
+      "path": "docs/handoffs/2026-08-12-d270-static-notification-localization-audit/handoff.md",
+      "delivery": "D270 / ARCH-243 Static notification localization audit",
+      "status": "accepted-with-limits",
+      "owner": "architect",
+      "created_at": "2026-08-12T12:49:20+08:00",
+      "acceptance_ids": ["S313"]
+    },
+    {
+      "id": "2026-08-12-d264-secondary-startup-fallback-localization",
+      "path": "docs/handoffs/2026-08-12-d264-secondary-startup-fallback-localization/handoff.md",
+      "delivery": "D264 / ARCH-242 Secondary startup fallback localization",
+      "status": "accepted-with-limits",
+      "owner": "architect",
+      "created_at": "2026-08-12T12:35:00+08:00",
+      "acceptance_ids": ["S312"]
+    },
+    {
+      "id": "2026-08-12-d263-workspace-search-outside-placeholder-localization",
+      "path": "docs/handoffs/2026-08-12-d263-workspace-search-outside-placeholder-localization/handoff.md",
+      "delivery": "D263 / ARCH-241 Workspace-search outside-workspace placeholder localization",
+      "status": "accepted-with-limits",
+      "owner": "architect",
+      "created_at": "2026-08-12T12:25:00+08:00",
+      "acceptance_ids": ["S311"]
+    },
+    {
+      "id": "2026-08-12-d262-early-startup-fallback-localization",
+      "path": "docs/handoffs/2026-08-12-d262-early-startup-fallback-localization/handoff.md",
+      "delivery": "D262 / ARCH-240 Early startup fallback localization",
+      "status": "accepted-with-limits",
+      "owner": "architect",
+      "created_at": "2026-08-12T12:15:00+08:00",
+      "acceptance_ids": ["S310"]
+    },
+    {
+      "id": "2026-08-12-d261-file-dialog-default-name-localization",
+      "path": "docs/handoffs/2026-08-12-d261-file-dialog-default-name-localization/handoff.md",
+      "delivery": "D261 / ARCH-239 File-dialog default-name localization",
+      "status": "accepted-with-limits",
+      "owner": "architect",
+      "created_at": "2026-08-12T12:05:00+08:00",
+      "acceptance_ids": ["S309"]
+    },
+    {
+      "id": "2026-08-12-d260-font-size-unit-locale-refresh",
+      "path": "docs/handoffs/2026-08-12-d260-font-size-unit-locale-refresh/handoff.md",
+      "delivery": "D260 / ARCH-238 Font-size unit locale refresh",
+      "status": "accepted-with-limits",
+      "owner": "architect",
+      "created_at": "2026-08-13T03:40:00+08:00",
+      "acceptance_ids": ["S308"]
+    },
+    {
+      "id": "2026-08-12-d259-message-dialog-button-localization",
+      "path": "docs/handoffs/2026-08-12-d259-message-dialog-button-localization/handoff.md",
+      "delivery": "D259 / ARCH-237 Message-dialog standard button localization",
+      "status": "accepted-with-limits",
+      "owner": "architect",
+      "created_at": "2026-08-13T03:20:00+08:00",
+      "acceptance_ids": ["S307"]
+    },
+    {
+      "id": "2026-08-12-d258-replace-all-error-localization",
+      "path": "docs/handoffs/2026-08-12-d258-replace-all-error-localization/handoff.md",
+      "delivery": "D258 / ARCH-236 Replace All error localization",
+      "status": "accepted-with-limits",
+      "owner": "architect",
+      "created_at": "2026-08-13T03:00:00+08:00",
+      "acceptance_ids": ["S306"]
+    },
+    {
+      "id": "2026-08-12-d257-builtin-plugin-status-name-localization",
+      "path": "docs/handoffs/2026-08-12-d257-builtin-plugin-status-name-localization/handoff.md",
+      "delivery": "D257 / ARCH-235 Built-in plugin status-name localization",
+      "status": "accepted-with-limits",
+      "owner": "architect",
+      "created_at": "2026-08-13T02:45:00+08:00",
+      "acceptance_ids": ["S305"]
+    },
+    {
+      "id": "2026-08-12-d256-builtin-document-stats-localization",
+      "path": "docs/handoffs/2026-08-12-d256-builtin-document-stats-localization/handoff.md",
+      "delivery": "D256 / ARCH-234 Built-in document-statistics localization",
+      "status": "accepted-with-limits",
+      "owner": "architect",
+      "created_at": "2026-08-13T02:20:00+08:00",
+      "acceptance_ids": ["S304"]
+    },
+    {
+      "id": "2026-08-12-d255-application-error-localization-boundary",
+      "path": "docs/handoffs/2026-08-12-d255-application-error-localization-boundary/handoff.md",
+      "delivery": "D255 / ARCH-233 Application-error localization boundary",
+      "status": "accepted-with-limits",
+      "owner": "architect",
+      "created_at": "2026-08-13T01:50:00+08:00",
+      "acceptance_ids": ["S303"]
+    },
+    {
+      "id": "2026-08-12-d254-frozen-startup-runtime-dependency-diagnostic",
+      "path": "docs/handoffs/2026-08-12-d254-frozen-startup-runtime-dependency-diagnostic/handoff.md",
+      "delivery": "D254 / ARCH-232 Frozen-startup runtime dependency diagnostic",
+      "status": "accepted-with-limits",
+      "owner": "architect",
+      "created_at": "2026-08-13T01:20:00+08:00",
+      "acceptance_ids": ["S302"]
+    },
+    {
+      "id": "2026-08-12-d253-workspace-entry-error-locale-refresh",
+      "path": "docs/handoffs/2026-08-12-d253-workspace-entry-error-locale-refresh/handoff.md",
+      "delivery": "D253 / ARCH-231 Workspace-entry error locale refresh",
+      "status": "accepted-with-limits",
+      "owner": "architect",
+      "created_at": "2026-08-13T00:50:00+08:00",
+      "acceptance_ids": ["S301"]
+    },
+    {
+      "id": "2026-08-12-d252-plugin-diagnostic-locale-refresh",
+      "path": "docs/handoffs/2026-08-12-d252-plugin-diagnostic-locale-refresh/handoff.md",
+      "delivery": "D252 / ARCH-230 Plugin diagnostic locale refresh",
+      "status": "accepted-with-limits",
+      "owner": "architect",
+      "created_at": "2026-08-13T00:20:00+08:00",
+      "acceptance_ids": ["S300"]
+    },
+    {
+      "id": "2026-08-12-d251-workspace-search-diagnostic-locale-refresh",
+      "path": "docs/handoffs/2026-08-12-d251-workspace-search-diagnostic-locale-refresh/handoff.md",
+      "delivery": "D251 / ARCH-229 Workspace-search diagnostic locale refresh",
+      "status": "accepted-with-limits",
+      "owner": "architect",
+      "created_at": "2026-08-12T23:20:00+08:00",
+      "acceptance_ids": ["S299"]
+    },
+    {
+      "id": "2026-08-12-d250-workspace-search-status-locale-refresh",
+      "path": "docs/handoffs/2026-08-12-d250-workspace-search-status-locale-refresh/handoff.md",
+      "delivery": "D250 / ARCH-228 Workspace search status locale refresh",
+      "status": "accepted-with-limits",
+      "owner": "architect",
+      "created_at": "2026-08-12T22:20:00+08:00",
+      "acceptance_ids": ["S298"]
+    },
+    {
+      "id": "2026-08-12-d249-workspace-error-locale-refresh",
+      "path": "docs/handoffs/2026-08-12-d249-workspace-error-locale-refresh/handoff.md",
+      "delivery": "D249 / ARCH-227 Workspace error locale refresh",
+      "status": "accepted-with-limits",
+      "owner": "architect",
+      "created_at": "2026-08-12T21:20:00+08:00",
+      "acceptance_ids": ["S297"]
+    },
+    {
+      "id": "2026-08-12-d248-workspace-typed-error-projection",
+      "path": "docs/handoffs/2026-08-12-d248-workspace-typed-error-projection/handoff.md",
+      "delivery": "D248 / ARCH-226 Workspace typed-error projection",
+      "status": "accepted-with-limits",
+      "owner": "architect",
+      "created_at": "2026-08-12T20:20:00+08:00",
+      "acceptance_ids": ["S296"]
+    },
+    {
+      "id": "2026-08-12-d247-typed-secondary-error-localization",
+      "path": "docs/handoffs/2026-08-12-d247-typed-secondary-error-localization/handoff.md",
+      "delivery": "D247 / ARCH-225 Typed secondary error localization",
+      "status": "accepted-with-limits",
+      "owner": "architect",
+      "created_at": "2026-08-12T19:20:00+08:00",
+      "acceptance_ids": ["S295"]
+    },
+    {
+      "id": "2026-08-12-d246-startup-stat-routing",
+      "path": "docs/handoffs/2026-08-12-d246-startup-stat-routing/handoff.md",
+      "delivery": "D246 / ARCH-224 Startup path stat routing",
+      "status": "accepted-with-limits",
+      "owner": "architect",
+      "created_at": "2026-08-12T18:20:00+08:00",
+      "acceptance_ids": ["S294"]
+    },
+    {
+      "id": "2026-08-12-d245-file-error-localization",
+      "path": "docs/handoffs/2026-08-12-d245-file-error-localization/handoff.md",
+      "delivery": "D245 / UI-27 Typed file-error localization",
+      "status": "accepted-with-limits",
+      "owner": "architect",
+      "created_at": "2026-08-12T17:20:00+08:00",
+      "acceptance_ids": ["S293"]
+    },
+    {
+      "id": "2026-08-12-d244-startup-path-error-localization",
+      "path": "docs/handoffs/2026-08-12-d244-startup-path-error-localization/handoff.md",
+      "delivery": "D244 / UI-26 Startup-path error localization",
+      "status": "accepted-with-limits",
+      "owner": "architect",
+      "created_at": "2026-08-12T16:40:00+08:00",
+      "acceptance_ids": ["S292"]
+    },
+    {
+      "id": "2026-08-12-d243-readable-accent-text",
+      "path": "docs/handoffs/2026-08-12-d243-readable-accent-text/handoff.md",
+      "delivery": "D243 / UI-25 Readable accent text endpoints",
+      "status": "accepted-with-limits",
+      "owner": "architect",
+      "created_at": "2026-08-12T16:20:00+08:00",
+      "acceptance_ids": ["S291"]
+    },
+    {
+      "id": "2026-08-12-d242-file-dialog-all-files-default",
+      "path": "docs/handoffs/2026-08-12-d242-file-dialog-all-files-default/handoff.md",
+      "delivery": "D242 / ARCH-223 File dialog all-files default",
+      "status": "accepted-with-limits",
+      "owner": "architect",
+      "created_at": "2026-08-12T15:30:00+08:00",
+      "acceptance_ids": ["S290"]
+    },
+    {
+      "id": "2026-08-12-d241-startup-provenance-diagnostic",
+      "path": "docs/handoffs/2026-08-12-d241-startup-provenance-diagnostic/handoff.md",
+      "delivery": "D241 / ARCH-222 Startup provenance diagnostic",
+      "status": "accepted-with-limits",
+      "owner": "architect",
+      "created_at": "2026-08-12T14:30:00+08:00",
+      "acceptance_ids": ["S289"]
+    },
+    {
+      "id": "2026-08-12-d240-frozen-entrypoint-path-hardening",
+      "path": "docs/handoffs/2026-08-12-d240-frozen-entrypoint-path-hardening/handoff.md",
+      "delivery": "D240 / ARCH-221 Frozen entrypoint path hardening",
+      "status": "accepted-with-limits",
+      "owner": "architect",
+      "created_at": "2026-08-12T13:30:00+08:00",
+      "acceptance_ids": ["S288"]
+    },
+    {
+      "id": "2026-08-12-d239-target-identity-preflight",
+      "path": "docs/handoffs/2026-08-12-d239-target-identity-preflight/handoff.md",
+      "delivery": "D239 / ARCH-220 Target identity preflight",
+      "status": "accepted-with-limits",
+      "owner": "architect",
+      "created_at": "2026-08-12T12:30:00+08:00",
+      "acceptance_ids": ["S287"]
+    },
+    {
+      "id": "2026-08-12-d238-update-transaction-safety",
+      "path": "docs/handoffs/2026-08-12-d238-update-transaction-safety/handoff.md",
+      "delivery": "D238 / ARCH-219 Update transaction safety",
+      "status": "accepted-with-limits",
+      "owner": "architect",
+      "created_at": "2026-08-12T11:30:00+08:00",
+      "acceptance_ids": ["S286"]
+    },
+    {
+      "id": "2026-08-12-d237-multi-association-safety",
+      "path": "docs/handoffs/2026-08-12-d237-multi-association-safety/handoff.md",
+      "delivery": "D237 / ARCH-217 Multi-association safety",
+      "status": "accepted-with-limits",
+      "owner": "architect",
+      "created_at": "2026-08-12T10:30:00+08:00",
+      "acceptance_ids": ["S285"]
+    },
+    {
+      "id": "2026-08-12-d235-startup-path-edge-routing",
+      "path": "docs/handoffs/2026-08-12-d235-startup-path-edge-routing/handoff.md",
+      "delivery": "D235 / ARCH-216 Startup-path edge routing",
+      "status": "accepted-with-limits",
+      "owner": "architect",
+      "created_at": "2026-08-12T09:30:00+08:00",
+      "acceptance_ids": ["S284"]
+    },
+    {
+      "id": "2026-08-12-d233-desktop-file-launch",
+      "path": "docs/handoffs/2026-08-12-d233-desktop-file-launch/handoff.md",
+      "delivery": "D233 / ARCH-215 Desktop file-launch routing",
+      "status": "accepted-with-limits",
+      "owner": "architect",
+      "created_at": "2026-08-12T08:30:00+08:00",
+      "acceptance_ids": ["S283"]
+    },
+    {
+      "id": "2026-08-12-d232-entry-import-guard",
+      "path": "docs/handoffs/2026-08-12-d232-entry-import-guard/handoff.md",
+      "delivery": "D232 / ARCH-214 Guarded entry-point application import",
+      "status": "accepted-with-limits",
+      "owner": "architect",
+      "created_at": "2026-08-12T08:00:00+08:00",
+      "acceptance_ids": ["S282"]
+    },
+    {
+      "id": "2026-08-12-d231-messagebox-zero-return-fallback",
+      "path": "docs/handoffs/2026-08-12-d231-messagebox-zero-return-fallback/handoff.md",
+      "delivery": "D231 / ARCH-213 MessageBox zero-return fallback",
+      "status": "accepted-with-limits",
+      "owner": "architect",
+      "created_at": "2026-08-12T07:30:00+08:00",
+      "acceptance_ids": ["S281"]
+    },
+    {
+      "id": "2026-08-12-d230-startup-fallback-display-fail-open",
+      "path": "docs/handoffs/2026-08-12-d230-startup-fallback-display-fail-open/handoff.md",
+      "delivery": "D230 / ARCH-212 Startup fallback display fail-open",
+      "status": "accepted-with-limits",
+      "owner": "architect",
+      "created_at": "2026-08-12T07:00:00+08:00",
+      "acceptance_ids": ["S280"]
+    },
+    {
+      "id": "2026-08-12-d229-startup-diagnostic-path-fail-open",
+      "path": "docs/handoffs/2026-08-12-d229-startup-diagnostic-path-fail-open/handoff.md",
+      "delivery": "D229 / ARCH-211 Startup diagnostic path fail-open",
+      "status": "accepted-with-limits",
+      "owner": "architect",
+      "created_at": "2026-08-12T06:30:00+08:00",
+      "acceptance_ids": ["S279"]
+    },
+    {
+      "id": "2026-08-12-d228-startup-failure-context",
+      "path": "docs/handoffs/2026-08-12-d228-startup-failure-context/handoff.md",
+      "delivery": "D228 / ARCH-210 Startup failure context record",
+      "status": "accepted-with-limits",
+      "owner": "architect",
+      "created_at": "2026-08-12T06:00:00+08:00",
+      "acceptance_ids": ["S278"]
+    },
+    {
+      "id": "2026-08-12-d227-private-attribute-audit",
+      "path": "docs/handoffs/2026-08-12-d227-private-attribute-audit/handoff.md",
+      "delivery": "D227 / ARCH-209 Private attribute declaration-aware audit",
+      "status": "accepted-with-limits",
+      "owner": "architect",
+      "created_at": "2026-08-12T05:00:00+08:00",
+      "acceptance_ids": ["S277"]
+    },
+    {
+      "id": "2026-08-12-d226-private-self-call-contract-audit",
+      "path": "docs/handoffs/2026-08-12-d226-private-self-call-contract-audit/handoff.md",
+      "delivery": "D226 / ARCH-208 Private self-call contract audit",
+      "status": "accepted-with-limits",
+      "owner": "architect",
+      "created_at": "2026-08-12T04:10:00+08:00",
+      "acceptance_ids": ["S276"]
+    },
+    {
+      "id": "2026-08-12-d225-command-surface-locale-fix",
+      "path": "docs/handoffs/2026-08-12-d225-command-surface-locale-fix/handoff.md",
+      "delivery": "D225 / ARCH-207 Command-surface locale accessor startup fix",
+      "status": "accepted-with-limits",
+      "owner": "architect",
+      "created_at": "2026-08-12T00:30:00+08:00",
+      "acceptance_ids": ["S275"]
+    },
+    {
+      "id": "2026-08-11-d223-startup-diagnostic",
+      "path": "docs/handoffs/2026-08-11-d223-startup-diagnostic/handoff.md",
+      "delivery": "D223 / ARCH-206 No-window packaged startup diagnostic",
+      "status": "accepted-with-limits",
+      "owner": "architect",
+      "created_at": "2026-08-11T23:59:30+08:00",
+      "acceptance_ids": ["S274"]
+    },
+    {
+      "id": "2026-08-11-d222-startup-failure-boundary",
+      "path": "docs/handoffs/2026-08-11-d222-startup-failure-boundary/handoff.md",
+      "delivery": "D222 / ARCH-205 Windowed startup-failure boundary",
+      "status": "accepted-with-limits",
+      "owner": "architect",
+      "created_at": "2026-08-11T23:59:00+08:00",
+      "acceptance_ids": ["S273"]
+    },
+    {
+      "id": "2026-08-11-d221-i18n-literal-key-gate",
+      "path": "docs/handoffs/2026-08-11-d221-i18n-literal-key-gate/handoff.md",
+      "delivery": "D221 / ARCH-204 i18n literal-key static gate",
+      "status": "accepted-with-limits",
+      "owner": "architect",
+      "created_at": "2026-08-11T23:50:00+08:00",
+      "acceptance_ids": ["S272"]
+    },
+    {
+      "id": "2026-08-11-d220-main-shell-low-noise",
+      "path": "docs/handoffs/2026-08-11-d220-main-shell-low-noise/handoff.md",
+      "delivery": "D220 / UI-118 Main-shell low-noise visual hierarchy",
+      "status": "accepted-with-limits",
+      "owner": "architect",
+      "created_at": "2026-08-11T23:59:00+08:00",
+      "acceptance_ids": ["S271"]
+    },
+    {
+      "id": "2026-08-11-d219-application-error-taxonomy",
+      "path": "docs/handoffs/2026-08-11-d219-application-error-taxonomy/handoff.md",
+      "delivery": "D219 / ARCH-203 Remaining application error taxonomy",
+      "status": "accepted-with-limits",
+      "owner": "architect",
+      "created_at": "2026-08-11T23:59:00+08:00",
+      "acceptance_ids": ["S270"]
+    },
+    {
+      "id": "2026-08-11-d218-workspace-search-error-taxonomy",
+      "path": "docs/handoffs/2026-08-11-d218-workspace-search-error-taxonomy/handoff.md",
+      "delivery": "D218 / ARCH-202 Workspace-search application error taxonomy",
+      "status": "accepted-with-limits",
+      "owner": "architect",
+      "created_at": "2026-08-11T23:59:00+08:00",
+      "acceptance_ids": ["S269"]
+    },
+    {
+      "id": "2026-08-11-d217-toolbar-brand-anchor",
+      "path": "docs/handoffs/2026-08-11-d217-toolbar-brand-anchor/handoff.md",
+      "delivery": "D217 / UI-117 Toolbar brand anchor",
+      "status": "accepted-with-limits",
+      "owner": "architect",
+      "created_at": "2026-08-11T23:59:00+08:00",
+      "acceptance_ids": ["S268"]
+    },
+    {
+      "id": "2026-08-11-d216-editor-policy-error-taxonomy",
+      "path": "docs/handoffs/2026-08-11-d216-editor-policy-error-taxonomy/handoff.md",
+      "delivery": "D216 / ARCH-201 Editor policy error taxonomy",
+      "status": "accepted-with-limits",
+      "owner": "architect",
+      "created_at": "2026-08-11T23:59:00+08:00",
+      "acceptance_ids": ["S267"]
+    },
+    {
+      "id": "2026-08-11-d215-accent-endpoint-foreground",
+      "path": "docs/handoffs/2026-08-11-d215-accent-endpoint-foreground/handoff.md",
+      "delivery": "D215 / UI-116 / ARCH-200 Semantic accent endpoint foregrounds",
+      "status": "accepted-with-limits",
+      "owner": "architect",
+      "created_at": "2026-08-11T23:59:00+08:00",
+      "acceptance_ids": ["S266"]
+    },
+    {
+      "id": "2026-08-11-d214-application-error-taxonomy",
+      "path": "docs/handoffs/2026-08-11-d214-application-error-taxonomy/handoff.md",
+      "delivery": "D214 / ARCH-199 Application error taxonomy",
+      "status": "accepted-with-limits",
+      "owner": "architect",
+      "created_at": "2026-08-11T23:59:00+08:00",
+      "acceptance_ids": ["S265"]
+    },
+    {
+      "id": "2026-08-11-d213-editor-shell-accent",
+      "path": "docs/handoffs/2026-08-11-d213-editor-shell-accent/handoff.md",
+      "delivery": "D213 / UI-115 / ARCH-198 Editor-shell brand edge",
+      "status": "accepted-with-limits",
+      "owner": "architect",
+      "created_at": "2026-08-11T23:59:00+08:00",
+      "acceptance_ids": ["S264"]
+    },
+    {
+      "id": "2026-08-11-d212-localized-untitled-tab",
+      "path": "docs/handoffs/2026-08-11-d212-localized-untitled-tab/handoff.md",
+      "delivery": "D212 / UI-114 / ARCH-197 Localized untitled tab title",
+      "status": "accepted-with-limits",
+      "owner": "architect",
+      "created_at": "2026-08-11T23:59:00+08:00",
+      "acceptance_ids": ["S263"]
+    },
+    {
+      "id": "2026-08-11-d211-workspace-disabled-item",
+      "path": "docs/handoffs/2026-08-11-d211-workspace-disabled-item/handoff.md",
+      "delivery": "D211 / UI-113 / ARCH-196 Workspace disabled-item hierarchy",
+      "status": "accepted-with-limits",
+      "owner": "architect",
+      "created_at": "2026-08-11T23:59:00+08:00",
+      "acceptance_ids": ["S262"]
+    },
+    {
+      "id": "2026-08-11-d210-dialog-filter",
+      "path": "docs/handoffs/2026-08-11-d210-dialog-filter/handoff.md",
+      "delivery": "D210 / UI-112 / ARCH-195 Default document filter coverage",
+      "status": "accepted-with-limits",
+      "owner": "architect",
+      "created_at": "2026-08-11T23:59:00+08:00",
+      "acceptance_ids": ["S261"]
+    },
+    {
+      "id": "2026-08-11-d209-plugin-disabled",
+      "path": "docs/handoffs/2026-08-11-d209-plugin-disabled/handoff.md",
+      "delivery": "D209 / UI-111 / ARCH-194 Plugin disabled action hierarchy",
+      "status": "accepted-with-limits",
+      "owner": "architect",
+      "created_at": "2026-08-11T23:59:00+08:00",
+      "acceptance_ids": ["S260"]
+    },
+    {
+      "id": "2026-08-11-d208-editor-locked-disabled",
+      "path": "docs/handoffs/2026-08-11-d208-editor-locked-disabled/handoff.md",
+      "delivery": "D208 / UI-110 / ARCH-193 Editor locked disabled-state hierarchy",
+      "status": "accepted-with-limits",
+      "owner": "architect",
+      "created_at": "2026-08-11T23:59:00+08:00",
+      "acceptance_ids": ["S259"]
+    },
+    {
+      "id": "2026-08-11-d207-workspace-tree-disabled",
+      "path": "docs/handoffs/2026-08-11-d207-workspace-tree-disabled/handoff.md",
+      "delivery": "D207 / UI-109 / ARCH-192 Workspace tree disabled-state hierarchy",
+      "status": "accepted-with-limits",
+      "owner": "architect",
+      "created_at": "2026-08-11T23:59:00+08:00",
+      "acceptance_ids": ["S258"]
+    },
+    {
+      "id": "2026-08-11-d205-findbar-navigation-disabled",
+      "path": "docs/handoffs/2026-08-11-d205-findbar-navigation-disabled/handoff.md",
+      "delivery": "D205 / UI-108 / ARCH-191 Find/Replace navigation disabled-state hierarchy",
+      "status": "accepted-with-limits",
+      "owner": "architect",
+      "created_at": "2026-08-11T23:59:00+08:00",
+      "acceptance_ids": ["S257"]
+    },
+    {
+      "id": "2026-08-11-d204-workspace-search-diagnostics-disabled",
+      "path": "docs/handoffs/2026-08-11-d204-workspace-search-diagnostics-disabled/handoff.md",
+      "delivery": "D204 / UI-107 / ARCH-190 Workspace-search diagnostics disabled-state hierarchy",
+      "status": "accepted-with-limits",
+      "owner": "architect",
+      "created_at": "2026-08-11T23:59:00+08:00",
+      "acceptance_ids": ["S256"]
+    },
+    {
+      "id": "2026-08-11-d203-shared-directory-capability",
+      "path": "docs/handoffs/2026-08-11-d203-shared-directory-capability/handoff.md",
+      "delivery": "D203 / ARCH-189 Shared directory capability for workspace search",
+      "status": "accepted-with-limits",
+      "owner": "architect",
+      "created_at": "2026-08-11T23:59:00+08:00",
+      "acceptance_ids": ["S255"]
+    },
+    {
+      "id": "2026-08-11-d202-workspace-provider-directory",
+      "path": "docs/handoffs/2026-08-11-d202-workspace-provider-directory/handoff.md",
+      "delivery": "D202 / ARCH-188 Workspace provider directory capability",
+      "status": "accepted-with-limits",
+      "owner": "architect",
+      "created_at": "2026-08-11T23:59:00+08:00",
+      "acceptance_ids": ["S254"]
+    },
+    {
+      "id": "2026-08-11-d201-disabled-menu-state",
+      "path": "docs/handoffs/2026-08-11-d201-disabled-menu-state/handoff.md",
+      "delivery": "D201 / UI-106 / ARCH-187 Disabled menu state hierarchy",
+      "status": "accepted-with-limits",
+      "owner": "architect",
+      "created_at": "2026-08-11T23:59:00+08:00",
+      "acceptance_ids": ["S253"]
+    },
+    {
+      "id": "2026-08-11-d200-package-source-determinism",
+      "path": "docs/handoffs/2026-08-11-d200-package-source-determinism/handoff.md",
+      "delivery": "D200 / ARCH-186 Package source-revision determinism",
+      "status": "accepted-with-limits",
+      "owner": "architect",
+      "created_at": "2026-08-11T23:59:00+08:00",
+      "acceptance_ids": ["S252"]
+    },
+    {
+      "id": "2026-08-11-d199-command-menu-contract",
+      "path": "docs/handoffs/2026-08-11-d199-command-menu-contract/handoff.md",
+      "delivery": "D199 / ARCH-185 Command menu contract closure",
+      "status": "accepted-with-limits",
+      "owner": "architect",
+      "created_at": "2026-08-11T23:59:00+08:00",
+      "acceptance_ids": ["S251"]
+    },
+    {
+      "id": "2026-08-11-d198-menu-affordance-cohesion",
+      "path": "docs/handoffs/2026-08-11-d198-menu-affordance-cohesion/handoff.md",
+      "delivery": "D198 / UI-105 / ARCH-184 Menu affordance cohesion",
+      "status": "accepted-with-limits",
+      "owner": "architect",
+      "created_at": "2026-08-11T23:59:00+08:00",
+      "acceptance_ids": ["S250"]
+    },
+    {
+      "id": "2026-08-11-d197-measure-packaged-compatibility",
+      "path": "docs/handoffs/2026-08-11-d197-measure-packaged-compatibility/handoff.md",
+      "delivery": "D197 / ARCH-183 Packaged measurement PowerShell compatibility",
+      "status": "accepted-with-limits",
+      "owner": "architect",
+      "created_at": "2026-08-11T23:59:00+08:00",
+      "acceptance_ids": ["S249"]
+    },
+    {
+      "id": "2026-08-11-d196-release-verifier-compatibility",
+      "path": "docs/handoffs/2026-08-11-d196-release-verifier-compatibility/handoff.md",
+      "delivery": "D196 / ARCH-182 Release verifier PowerShell compatibility",
+      "status": "accepted-with-limits",
+      "owner": "architect",
+      "created_at": "2026-08-11T23:59:00+08:00",
+      "acceptance_ids": ["S248"]
+    },
+    {
+      "id": "2026-08-11-d195-powershell-packaging-compatibility",
+      "path": "docs/handoffs/2026-08-11-d195-powershell-packaging-compatibility/handoff.md",
+      "delivery": "D195 / ARCH-181 Windows PowerShell packaging compatibility",
+      "status": "accepted-with-limits",
+      "owner": "architect",
+      "created_at": "2026-08-11T23:59:00+08:00",
+      "acceptance_ids": ["S247"]
+    },
+    {
+      "id": "2026-08-11-d194-native-control-affordance",
+      "path": "docs/handoffs/2026-08-11-d194-native-control-affordance/handoff.md",
+      "delivery": "D194 / UI-104 / ARCH-180 Native control affordance cohesion",
+      "status": "accepted-with-limits",
+      "owner": "architect",
+      "created_at": "2026-08-11T23:59:00+08:00",
+      "acceptance_ids": ["S246"]
+    },
+    {
+      "id": "2026-08-11-d193-close-guard-localization",
+      "path": "docs/handoffs/2026-08-11-d193-close-guard-localization/handoff.md",
+      "delivery": "D193 / UI-103 / ARCH-179 Close-guard pending feedback localization",
+      "status": "accepted-with-limits",
+      "owner": "architect",
+      "created_at": "2026-08-11T23:59:00+08:00",
+      "acceptance_ids": ["S245"]
+    },
+    {
+      "id": "2026-08-11-d192-plugin-failure-phase-localization",
+      "path": "docs/handoffs/2026-08-11-d192-plugin-failure-phase-localization/handoff.md",
+      "delivery": "D192 / UI-102 / ARCH-178 Plugin failure phase localization closure",
+      "status": "accepted-with-limits",
+      "owner": "architect",
+      "created_at": "2026-08-11T23:59:00+08:00",
+      "acceptance_ids": ["S244"]
+    },
+    {
+      "id": "2026-08-11-d191-dynamic-find-localization",
+      "path": "docs/handoffs/2026-08-11-d191-dynamic-find-localization/handoff.md",
+      "delivery": "D191 / UI-101 / ARCH-177 Dynamic Find/Replace status localization closure",
+      "status": "accepted-with-limits",
+      "owner": "architect",
+      "created_at": "2026-08-11T23:59:00+08:00",
+      "acceptance_ids": ["S243"]
+    },
+    {
+      "id": "2026-08-11-d190-command-palette-empty-state",
+      "path": "docs/handoffs/2026-08-11-d190-command-palette-empty-state/handoff.md",
+      "delivery": "D190 / UI-100 / ARCH-176 Command Palette empty-state boundary",
+      "status": "accepted-with-limits",
+      "owner": "architect",
+      "created_at": "2026-08-11T23:59:00+08:00",
+      "acceptance_ids": ["S242"]
+    },
+    {
+      "id": "2026-08-11-d189-search-empty-state",
+      "path": "docs/handoffs/2026-08-11-d189-search-empty-state/handoff.md",
+      "delivery": "D189 / UI-99 / ARCH-175 Workspace-search empty-state boundary",
+      "status": "accepted-with-limits",
+      "owner": "architect",
+      "created_at": "2026-08-11T23:59:00+08:00",
+      "acceptance_ids": ["S241"]
+    },
+    {
+      "id": "2026-08-11-d187-settings-scroll",
+      "path": "docs/handoffs/2026-08-11-d187-settings-scroll/handoff.md",
+      "delivery": "D187 / UI-98 / ARCH-174 Responsive Settings scroll boundary",
+      "status": "accepted-with-limits",
+      "owner": "architect",
+      "created_at": "2026-08-11T23:59:00+08:00",
+      "acceptance_ids": ["S240"]
+    },
+    {
+      "id": "2026-08-11-d186-workspace-file-entry",
+      "path": "docs/handoffs/2026-08-11-d186-workspace-file-entry/handoff.md",
+      "delivery": "D186 / UI-97 / ARCH-173 Workspace file-entry closure",
+      "status": "accepted-with-limits",
+      "owner": "architect",
+      "created_at": "2026-08-11T23:59:00+08:00",
+      "acceptance_ids": ["S239", "D186-AC01"]
+    },
+    {
+      "id": "2026-08-11-d185-form-control-highlight",
+      "path": "docs/handoffs/2026-08-11-d185-form-control-highlight/handoff.md",
+      "delivery": "D185 / UI-96 / ARCH-172 Form-control highlight closure",
+      "status": "accepted-with-limits",
+      "owner": "architect",
+      "created_at": "2026-08-11T23:59:00+08:00",
+      "acceptance_ids": ["S238", "D185-AC01"]
+    },
+    {
+      "id": "2026-08-11-d184-local-distribution-scripts",
+      "path": "docs/handoffs/2026-08-11-d184-local-distribution-scripts/handoff.md",
+      "delivery": "D184 / ARCH-171 Local hash-gated distribution scripts",
+      "status": "accepted-with-limits",
+      "owner": "architect",
+      "created_at": "2026-08-11T23:55:00+08:00",
+      "acceptance_ids": ["S237", "D184-AC01"]
+    },
+    {
+      "id": "2026-08-11-d183-surface-gradient-hierarchy",
+      "path": "docs/handoffs/2026-08-11-d183-surface-gradient-hierarchy/handoff.md",
+      "delivery": "D183 / ARCH-170 / UI-95 Surface-gradient hierarchy",
+      "status": "accepted-with-limits",
+      "owner": "architect",
+      "created_at": "2026-08-11T23:30:00+08:00",
+      "acceptance_ids": ["S236", "D183-AC01"]
+    },
+    {
+      "id": "2026-08-11-d182-theme-token-boundary",
+      "path": "docs/handoffs/2026-08-11-d182-theme-token-boundary/handoff.md",
+      "delivery": "D182 / ARCH-169 / UI-94 Theme token boundary",
+      "status": "accepted-with-limits",
+      "owner": "architect",
+      "created_at": "2026-08-11T23:00:00+08:00",
+      "acceptance_ids": ["S235", "D182-AC01"]
+    },
+    {
+      "id": "2026-08-11-d181-status-accessibility-localization",
+      "path": "docs/handoffs/2026-08-11-d181-status-accessibility-localization/handoff.md",
+      "delivery": "D181 / UI-93 / ARCH-168 Status accessibility localization",
+      "status": "accepted-with-limits",
+      "owner": "architect",
+      "created_at": "2026-08-11T22:30:00+08:00",
+      "acceptance_ids": ["S234", "D181-AC01"]
+    },
+    {
+      "id": "2026-08-11-d180-font-style-settings-contract",
+      "path": "docs/handoffs/2026-08-11-d180-font-style-settings-contract/handoff.md",
+      "delivery": "D180 / UI-92 / ARCH-167 Font style settings contract",
+      "status": "accepted-with-limits",
+      "owner": "architect",
+      "created_at": "2026-08-11T22:00:00+08:00",
+      "acceptance_ids": ["S233", "D180-AC01"]
+    },
+    {
+      "id": "2026-08-11-d179-plugin-catalog-guidance-capsule",
+      "path": "docs/handoffs/2026-08-11-d179-plugin-catalog-guidance-capsule/handoff.md",
+      "delivery": "D179 / UI-91 / ARCH-166 Plugin catalog guidance capsule",
+      "status": "accepted-with-limits",
+      "owner": "architect",
+      "created_at": "2026-08-11T21:30:00+08:00",
+      "acceptance_ids": ["S232", "D179-AC01"]
+    },
+    {
+      "id": "2026-08-11-d178-message-dialog-action-hierarchy",
+      "path": "docs/handoffs/2026-08-11-d178-message-dialog-action-hierarchy/handoff.md",
+      "delivery": "D178 / UI-90 / ARCH-165 Message dialog action hierarchy",
+      "status": "accepted-with-limits",
+      "owner": "architect",
+      "created_at": "2026-08-11T21:00:00+08:00",
+      "acceptance_ids": ["S231", "D178-AC01"]
+    },
+    {
+      "id": "2026-08-11-d177-settings-guidance-hierarchy",
+      "path": "docs/handoffs/2026-08-11-d177-settings-guidance-hierarchy/handoff.md",
+      "delivery": "D177 / UI-89 / ARCH-164 Settings guidance hierarchy",
+      "status": "accepted-with-limits",
+      "owner": "architect",
+      "created_at": "2026-08-11T20:30:00+08:00",
+      "acceptance_ids": ["S230", "D177-AC01"]
+    },
+    {
+      "id": "2026-08-11-d176-findbar-visual-rhythm",
+      "path": "docs/handoffs/2026-08-11-d176-findbar-visual-rhythm/handoff.md",
+      "delivery": "D176 / UI-88 / ARCH-163 FindBar visual rhythm",
+      "status": "accepted-with-limits",
+      "owner": "architect",
+      "created_at": "2026-08-11T19:30:00+08:00",
+      "acceptance_ids": ["S229", "D176-AC01"]
+    },
+    {
+      "id": "2026-08-11-d175-command-palette-visual-hierarchy",
+      "path": "docs/handoffs/2026-08-11-d175-command-palette-visual-hierarchy/handoff.md",
+      "delivery": "D175 / UI-87 / ARCH-162 Command Palette visual hierarchy",
+      "status": "accepted-with-limits",
+      "owner": "architect",
+      "created_at": "2026-08-11T18:30:00+08:00",
+      "acceptance_ids": ["S228", "D175-AC01"]
+    },
+    {
+      "id": "2026-08-11-d174-workspace-dock-visual-hierarchy",
+      "path": "docs/handoffs/2026-08-11-d174-workspace-dock-visual-hierarchy/handoff.md",
+      "delivery": "D174 / UI-86 / ARCH-161 Workspace-dock visual hierarchy",
+      "status": "accepted-with-limits",
+      "owner": "architect",
+      "created_at": "2026-08-11T17:30:00+08:00",
+      "acceptance_ids": ["S227", "D174-AC01"]
+    },
+    {
+      "id": "2026-08-11-d173-status-rail-visual-hierarchy",
+      "path": "docs/handoffs/2026-08-11-d173-status-rail-visual-hierarchy/handoff.md",
+      "delivery": "D173 / UI-85 / ARCH-160 Status-rail visual hierarchy",
+      "status": "accepted-with-limits",
+      "owner": "architect",
+      "created_at": "2026-08-11T16:30:00+08:00",
+      "acceptance_ids": ["S226", "D173-AC01"]
+    },
+    {
+      "id": "2026-08-11-d172-editor-stage-visual-depth",
+      "path": "docs/handoffs/2026-08-11-d172-editor-stage-visual-depth/handoff.md",
+      "delivery": "D172 / UI-84 / ARCH-159 Editor-stage visual depth",
+      "status": "accepted-with-limits",
+      "owner": "architect",
+      "created_at": "2026-08-11T15:30:00+08:00",
+      "acceptance_ids": ["S225", "D172-AC01"]
+    },
+    {
+      "id": "2026-08-11-d171-document-tab-visual-hierarchy",
+      "path": "docs/handoffs/2026-08-11-d171-document-tab-visual-hierarchy/handoff.md",
+      "delivery": "D171 / UI-83 / ARCH-158 Document-tab visual hierarchy",
+      "status": "accepted-with-limits",
+      "owner": "architect",
+      "created_at": "2026-08-11T14:30:00+08:00",
+      "acceptance_ids": ["S224", "D171-AC01"]
+    },
+    {
+      "id": "2026-08-11-d170-command-rail-visual-hierarchy",
+      "path": "docs/handoffs/2026-08-11-d170-command-rail-visual-hierarchy/handoff.md",
+      "delivery": "D170 / UI-82 / ARCH-157 Command-rail visual hierarchy",
+      "status": "accepted-with-limits",
+      "owner": "architect",
+      "created_at": "2026-08-11T13:30:00+08:00",
+      "acceptance_ids": ["S223", "D170-AC01"]
+    },
+    {
+      "id": "2026-08-11-d169-findbar-authored-action-icons",
+      "path": "docs/handoffs/2026-08-11-d169-findbar-authored-action-icons/handoff.md",
+      "delivery": "D169 / UI-81 / ARCH-156 FindBar authored action icons",
+      "status": "accepted-with-limits",
+      "owner": "architect",
+      "created_at": "2026-08-11T07:30:00+08:00",
+      "acceptance_ids": ["S222", "D169-AC01"]
+    },
+    {
+      "id": "2026-08-11-d168-workspace-entry-visual-semantics",
+      "path": "docs/handoffs/2026-08-11-d168-workspace-entry-visual-semantics/handoff.md",
+      "delivery": "D168 / UI-80 / ARCH-155 Workspace entry visual semantics",
+      "status": "accepted-with-limits",
+      "owner": "architect",
+      "created_at": "2026-08-11T07:00:00+08:00",
+      "acceptance_ids": ["S221", "D168-AC01"]
+    },
+    {
+      "id": "2026-08-11-d167-settings-typography-preview",
+      "path": "docs/handoffs/2026-08-11-d167-settings-typography-preview/handoff.md",
+      "delivery": "D167 / UI-79 / ARCH-154 Settings typography preview",
+      "status": "accepted-with-limits",
+      "owner": "architect",
+      "created_at": "2026-08-11T06:00:00+08:00",
+      "acceptance_ids": ["S220", "D167-AC01"]
+    },
+    {
+      "id": "2026-08-11-d166-font-choice-preview",
+      "path": "docs/handoffs/2026-08-11-d166-font-choice-preview/handoff.md",
+      "delivery": "D166 / UI-78 / ARCH-153 font-choice preview",
+      "status": "accepted-with-limits",
+      "owner": "architect",
+      "created_at": "2026-08-11T05:30:00+08:00",
+      "acceptance_ids": ["S219", "D166-AC01"]
+    },
+    {
+      "id": "2026-08-11-d165-support-handoff-packet-check",
+      "path": "docs/handoffs/2026-08-11-d165-support-handoff-packet-check/handoff.md",
+      "delivery": "D165 / ARCH-152 support handoff packet check",
+      "status": "accepted-with-limits",
+      "owner": "architect",
+      "created_at": "2026-08-11T04:55:00+08:00",
+      "acceptance_ids": ["S218", "D165-AC01"]
+    },
+    {
+      "id": "2026-08-11-d164-status-message-visual-weight",
+      "path": "docs/handoffs/2026-08-11-d164-status-message-visual-weight/handoff.md",
+      "delivery": "D164 / UI-77 status-message visual weight",
+      "status": "accepted-with-limits",
+      "owner": "architect",
+      "created_at": "2026-08-11T04:20:00+08:00",
+      "acceptance_ids": ["S217", "D164-AC01"]
+    },
+    {
+      "id": "2026-08-11-d163-recovery-capture-abort-ports",
+      "path": "docs/handoffs/2026-08-11-d163-recovery-capture-abort-ports/handoff.md",
+      "delivery": "D163 / ARCH-150 recovery-capture abort Ports contract",
+      "status": "accepted-with-limits",
+      "owner": "architect",
+      "created_at": "2026-08-11T03:10:00+08:00",
+      "acceptance_ids": ["S216", "D163-AC01"]
+    },
+    {
+      "id": "2026-08-11-d162-plugin-catalog-ports",
+      "path": "docs/handoffs/2026-08-11-d162-plugin-catalog-ports/handoff.md",
+      "delivery": "D162 / ARCH-149 plugin-catalog Ports contract",
+      "status": "accepted-with-limits",
+      "owner": "architect",
+      "created_at": "2026-08-11T02:40:00+08:00",
+      "acceptance_ids": ["S215", "D162-AC01"]
+    },
+    {
+      "id": "2026-08-11-d161-plugin-host-probe-ports",
+      "path": "docs/handoffs/2026-08-11-d161-plugin-host-probe-ports/handoff.md",
+      "delivery": "D161 / ARCH-148 plugin-host probe Ports contract",
+      "status": "accepted-with-limits",
+      "owner": "architect",
+      "created_at": "2026-08-11T02:10:00+08:00",
+      "acceptance_ids": ["S214", "D161-AC01"]
+    },
+    {
+      "id": "2026-08-13-d160-workspace-navigation-projection-ports",
+      "path": "docs/handoffs/2026-08-13-d160-workspace-navigation-projection-ports/handoff.md",
+      "delivery": "D160 / ARCH-147 workspace-navigation projection Ports contract",
+      "status": "accepted-with-limits",
+      "owner": "architect",
+      "created_at": "2026-08-13T01:05:00+08:00",
+      "acceptance_ids": ["S213", "D160-AC01"]
+    },
+    {
+      "id": "2026-08-13-d159-recovery-write-ports",
+      "path": "docs/handoffs/2026-08-13-d159-recovery-write-ports/handoff.md",
+      "delivery": "D159 / ARCH-146 recovery-write Ports contract",
+      "status": "accepted-with-limits",
+      "owner": "architect",
+      "created_at": "2026-08-13T00:45:00+08:00",
+      "acceptance_ids": ["S212", "D159-AC01"]
+    },
+    {
+      "id": "2026-08-13-d158-recovery-scan-ports",
+      "path": "docs/handoffs/2026-08-13-d158-recovery-scan-ports/handoff.md",
+      "delivery": "D158 / ARCH-145 recovery-scan Ports contract",
+      "status": "accepted-with-limits",
+      "owner": "architect",
+      "created_at": "2026-08-13T00:25:00+08:00",
+      "acceptance_ids": ["S211", "D158-AC01"]
+    },
+    {
+      "id": "2026-08-12-d157-recovery-delete-ports",
+      "path": "docs/handoffs/2026-08-12-d157-recovery-delete-ports/handoff.md",
+      "delivery": "D157 / ARCH-144 recovery-delete Ports contract",
+      "status": "accepted-with-limits",
+      "owner": "architect",
+      "created_at": "2026-08-13T00:10:00+08:00",
+      "acceptance_ids": ["S210", "D157-AC01"]
+    },
+    {
+      "id": "2026-08-12-d156-plugin-runtime-ports",
+      "path": "docs/handoffs/2026-08-12-d156-plugin-runtime-ports/handoff.md",
+      "delivery": "D156 / ARCH-143 plugin-runtime Ports contract",
+      "status": "accepted-with-limits",
+      "owner": "architect",
+      "created_at": "2026-08-12T23:55:00+08:00",
+      "acceptance_ids": ["S209", "D156-AC01"]
+    },
+    {
+      "id": "2026-08-12-d155-workspace-search-ports",
+      "path": "docs/handoffs/2026-08-12-d155-workspace-search-ports/handoff.md",
+      "delivery": "D155 / ARCH-142 workspace-search Ports contract",
+      "status": "accepted-with-limits",
+      "owner": "architect",
+      "created_at": "2026-08-12T23:45:00+08:00",
+      "acceptance_ids": ["S208", "D155-AC01"]
+    },
+    {
+      "id": "2026-08-12-d154-settings-save-ports",
+      "path": "docs/handoffs/2026-08-12-d154-settings-save-ports/handoff.md",
+      "delivery": "D154 / ARCH-141 settings-save Ports contract",
+      "status": "accepted-with-limits",
+      "owner": "architect",
+      "created_at": "2026-08-12T23:30:00+08:00",
+      "acceptance_ids": ["S207", "D154-AC01"]
+    },
+    {
+      "id": "2026-08-12-d153-replace-all-completion-ports",
+      "path": "docs/handoffs/2026-08-12-d153-replace-all-completion-ports/handoff.md",
+      "delivery": "D153 / ARCH-140 Replace All completion Ports contract",
+      "status": "accepted-with-limits",
+      "owner": "architect",
+      "created_at": "2026-08-12T23:00:00+08:00",
+      "acceptance_ids": [
+        "S206",
+        "D153-AC01"
+      ]
+    },
+    {
+      "id": "2026-08-12-d152-session-save-ports",
+      "path": "docs/handoffs/2026-08-12-d152-session-save-ports/handoff.md",
+      "delivery": "D152 / ARCH-139 session-save Ports contract",
+      "status": "accepted-with-limits",
+      "owner": "architect",
+      "created_at": "2026-08-12T22:00:00+08:00",
+      "acceptance_ids": [
+        "S205",
+        "D152-AC01"
+      ]
+    },
+    {
+      "id": "2026-08-12-d151-session-load-ports",
+      "path": "docs/handoffs/2026-08-12-d151-session-load-ports/handoff.md",
+      "delivery": "D151 / ARCH-138 session-load Ports contract",
+      "status": "accepted-with-limits",
+      "owner": "architect",
+      "created_at": "2026-08-12T21:00:00+08:00",
+      "acceptance_ids": [
+        "S204",
+        "D151-AC01"
+      ]
+    },
+    {
+      "id": "2026-08-12-ui-76-inactive-selection-contrast",
+      "path": "docs/handoffs/2026-08-12-ui-76-inactive-selection-contrast/handoff.md",
+      "delivery": "UI-76 / ARCH-137 inactive-selection contrast closure",
+      "status": "accepted-with-limits",
+      "owner": "architect",
+      "created_at": "2026-08-12T20:00:00+08:00",
+      "acceptance_ids": [
+        "S203",
+        "UI-76-AC01"
+      ]
+    },
+    {
+      "id": "2026-08-12-d150-recovery-projection-ports",
+      "path": "docs/handoffs/2026-08-12-d150-recovery-projection-ports/handoff.md",
+      "delivery": "D150 / ARCH-136 recovery projection Ports contract",
+      "status": "accepted-with-limits",
+      "owner": "architect",
+      "created_at": "2026-08-12T19:00:00+08:00",
+      "acceptance_ids": [
+        "S202",
+        "D150-AC01"
+      ]
+    },
+    {
+      "id": "2026-08-12-d149-settings-save-projection-ports",
+      "path": "docs/handoffs/2026-08-12-d149-settings-save-projection-ports/handoff.md",
+      "delivery": "D149 / ARCH-135 settings-save projection Ports contract",
+      "status": "accepted-with-limits",
+      "owner": "architect",
+      "created_at": "2026-08-12T18:00:00+08:00",
+      "acceptance_ids": [
+        "S201",
+        "D149-AC01"
+      ]
+    },
+    {
+      "id": "2026-08-12-d148-editor-action-admission",
+      "path": "docs/handoffs/2026-08-12-d148-editor-action-admission/handoff.md",
+      "delivery": "D148 / ARCH-134 editor-action admission",
+      "status": "accepted-with-limits",
+      "owner": "architect",
+      "created_at": "2026-08-12T17:00:00+08:00",
+      "acceptance_ids": [
+        "S200",
+        "D148-AC01"
+      ]
+    },
+    {
+      "id": "2026-08-12-ui-75-active-document-tab-emphasis",
+      "path": "docs/handoffs/2026-08-12-ui-75-active-document-tab-emphasis/handoff.md",
+      "delivery": "UI-75 / ARCH-133 active-document tab emphasis",
+      "status": "accepted-with-limits",
+      "owner": "architect",
+      "created_at": "2026-08-12T16:00:00+08:00",
+      "acceptance_ids": [
+        "S199",
+        "UI-75-AC01"
+      ]
+    },
+    {
+      "id": "2026-08-12-d147-current-document-transition",
+      "path": "docs/handoffs/2026-08-12-d147-current-document-transition/handoff.md",
+      "delivery": "D147 / ARCH-132 current-document transition projection",
+      "status": "accepted-with-limits",
+      "owner": "architect",
+      "created_at": "2026-08-12T15:00:00+08:00",
+      "acceptance_ids": [
+        "S198",
+        "D147-AC01"
+      ]
+    },
+    {
+      "id": "2026-08-12-d146-document-change-projection-coordinator",
+      "path": "docs/handoffs/2026-08-12-d146-document-change-projection-coordinator/handoff.md",
+      "delivery": "D146 / ARCH-131 editor-change projection",
+      "status": "accepted-with-limits",
+      "owner": "architect",
+      "created_at": "2026-08-12T14:00:00+08:00",
+      "acceptance_ids": [
+        "S197",
+        "D146-AC01"
+      ]
+    },
+    {
+      "id": "2026-08-12-ui-74-status-rail-context-divider",
+      "path": "docs/handoffs/2026-08-12-ui-74-status-rail-context-divider/handoff.md",
+      "delivery": "UI-74 / ARCH-130 status-rail context divider",
+      "status": "accepted-with-limits",
+      "owner": "architect",
+      "created_at": "2026-08-12T13:00:00+08:00",
+      "acceptance_ids": [
+        "S196",
+        "UI-74-AC01"
+      ]
+    },
+    {
+      "id": "2026-08-12-d145-status-phase-policy",
+      "path": "docs/handoffs/2026-08-12-d145-status-phase-policy/handoff.md",
+      "delivery": "D145 / ARCH-129 status-phase policy",
+      "status": "accepted-with-limits",
+      "owner": "architect",
+      "created_at": "2026-08-12T12:00:00+08:00",
+      "acceptance_ids": [
+        "S195",
+        "D145-AC01"
+      ]
+    },
+    {
+      "id": "2026-08-12-ui-73-document-stage-edge",
+      "path": "docs/handoffs/2026-08-12-ui-73-document-stage-edge/handoff.md",
+      "delivery": "UI-73 / ARCH-128 document-stage edge",
+      "status": "accepted-with-limits",
+      "owner": "architect",
+      "created_at": "2026-08-12T11:00:00+08:00",
+      "acceptance_ids": [
+        "S194",
+        "UI-73-AC01"
+      ]
+    },
+    {
+      "id": "2026-08-12-ui-72-status-notification-pill",
+      "path": "docs/handoffs/2026-08-12-ui-72-status-notification-pill/handoff.md",
+      "delivery": "UI-72 / ARCH-127 status notification pill",
+      "status": "accepted-with-limits",
+      "owner": "architect",
+      "created_at": "2026-08-12T10:30:00+08:00",
+      "acceptance_ids": [
+        "S193",
+        "UI-72-AC01"
+      ]
+    },
+    {
+      "id": "2026-08-12-d144-close-guard-feedback-coordinator",
+      "path": "docs/handoffs/2026-08-12-d144-close-guard-feedback-coordinator/handoff.md",
+      "delivery": "D144 / ARCH-126 close-guard feedback coordinator",
+      "status": "accepted-with-limits",
+      "owner": "architect",
+      "created_at": "2026-08-12T10:00:00+08:00",
+      "acceptance_ids": [
+        "S192",
+        "D144-AC01"
+      ]
+    },
+    {
+      "id": "2026-08-12-d143-presentation-locale-coordinator",
+      "path": "docs/handoffs/2026-08-12-d143-presentation-locale-coordinator/handoff.md",
+      "delivery": "D143 / ARCH-125 presentation locale coordinator",
+      "status": "accepted-with-limits",
+      "owner": "architect",
+      "created_at": "2026-08-12T09:30:00+08:00",
+      "acceptance_ids": [
+        "S191",
+        "D143-AC01"
+      ]
+    },
+    {
+      "id": "2026-08-12-d142-presentation-contract-audit-closure",
+      "path": "docs/handoffs/2026-08-12-d142-presentation-contract-audit-closure/handoff.md",
+      "delivery": "D142 / ARCH-124 presentation contract audit closure",
+      "status": "accepted-with-limits",
+      "owner": "architect",
+      "created_at": "2026-08-12T09:00:00+08:00",
+      "acceptance_ids": [
+        "S190",
+        "D142-AC01"
+      ]
+    },
+    {
+      "id": "2026-08-12-ui-71-workspace-search-query-card",
+      "path": "docs/handoffs/2026-08-12-ui-71-workspace-search-query-card/handoff.md",
+      "delivery": "UI-71 / ARCH-123 workspace-search query card",
+      "status": "accepted-with-limits",
+      "owner": "architect",
+      "created_at": "2026-08-12T08:00:00+08:00",
+      "acceptance_ids": [
+        "S189",
+        "UI-71-AC01"
+      ]
+    },
+    {
+      "id": "2026-08-12-d141-document-save-picker-admission-boundary",
+      "path": "docs/handoffs/2026-08-12-d141-document-save-picker-admission-boundary/handoff.md",
+      "delivery": "D141 / ARCH-122 document-save picker admission boundary",
+      "status": "accepted-with-limits",
+      "owner": "architect",
+      "created_at": "2026-08-12T07:30:00+08:00",
+      "acceptance_ids": [
+        "S188",
+        "D141-AC01"
+      ]
+    },
+    {
+      "id": "2026-08-12-d140-workspace-search-surface-admission-boundary",
+      "path": "docs/handoffs/2026-08-12-d140-workspace-search-surface-admission-boundary/handoff.md",
+      "delivery": "D140 / ARCH-121 workspace-search surface admission boundary",
+      "status": "accepted-with-limits",
+      "owner": "architect",
+      "created_at": "2026-08-12T07:00:00+08:00",
+      "acceptance_ids": [
+        "S187",
+        "D140-AC01"
+      ]
+    },
+    {
+      "id": "2026-08-12-ui-70-modern-shell-elevation",
+      "path": "docs/handoffs/2026-08-12-ui-70-modern-shell-elevation/handoff.md",
+      "delivery": "UI-70 / ARCH-120 modern shell elevation",
+      "status": "accepted-with-limits",
+      "owner": "architect",
+      "created_at": "2026-08-12T06:30:00+08:00",
+      "acceptance_ids": [
+        "S186",
+        "UI-70-AC01"
+      ]
+    },
+    {
+      "id": "2026-08-12-d139-workspace-picker-admission-boundary",
+      "path": "docs/handoffs/2026-08-12-d139-workspace-picker-admission-boundary/handoff.md",
+      "delivery": "D139 / ARCH-119 workspace-picker admission boundary",
+      "status": "accepted-with-limits",
+      "owner": "architect",
+      "created_at": "2026-08-12T06:00:00+08:00",
+      "acceptance_ids": [
+        "S185",
+        "D139-AC01"
+      ]
+    },
+    {
+      "id": "2026-08-12-d138-document-picker-admission-boundary",
+      "path": "docs/handoffs/2026-08-12-d138-document-picker-admission-boundary/handoff.md",
+      "delivery": "D138 / ARCH-118 document-picker admission boundary",
+      "status": "accepted-with-limits",
+      "owner": "architect",
+      "created_at": "2026-08-12T05:30:00+08:00",
+      "acceptance_ids": [
+        "S184",
+        "D138-AC01"
+      ]
+    },
+    {
+      "id": "2026-08-12-ui-69-settings-dialog-card-hierarchy",
+      "path": "docs/handoffs/2026-08-12-ui-69-settings-dialog-card-hierarchy/handoff.md",
+      "delivery": "UI-69 / ARCH-117 settings-dialog card hierarchy",
+      "status": "accepted-with-limits",
+      "owner": "architect",
+      "created_at": "2026-08-12T05:00:00+08:00",
+      "acceptance_ids": [
+        "S183",
+        "UI-69-AC01"
+      ]
+    },
+    {
+      "id": "2026-08-12-ui-68-semantic-state-contrast",
+      "path": "docs/handoffs/2026-08-12-ui-68-semantic-state-contrast/handoff.md",
+      "delivery": "UI-68 / ARCH-116 semantic state contrast closure",
+      "status": "accepted-with-limits",
+      "owner": "architect",
+      "created_at": "2026-08-12T04:30:00+08:00",
+      "acceptance_ids": [
+        "S182",
+        "UI-68-AC01"
+      ]
+    },
+    {
+      "id": "2026-08-12-d137-document-creation-admission-boundary",
+      "path": "docs/handoffs/2026-08-12-d137-document-creation-admission-boundary/handoff.md",
+      "delivery": "D137 / ARCH-115 document-creation admission boundary",
+      "status": "accepted-with-limits",
+      "owner": "architect",
+      "created_at": "2026-08-12T04:00:00+08:00",
+      "acceptance_ids": [
+        "S181",
+        "D137-AC01"
+      ]
+    },
+    {
+      "id": "2026-08-12-d136-settings-save-admission-boundary",
+      "path": "docs/handoffs/2026-08-12-d136-settings-save-admission-boundary/handoff.md",
+      "delivery": "D136 / ARCH-114 settings-save admission boundary",
+      "status": "accepted-with-limits",
+      "owner": "architect",
+      "created_at": "2026-08-12T03:30:00+08:00",
+      "acceptance_ids": [
+        "S180",
+        "D136-AC01"
+      ]
+    },
+    {
+      "id": "2026-08-12-d135-workspace-navigation-admission-boundary",
+      "path": "docs/handoffs/2026-08-12-d135-workspace-navigation-admission-boundary/handoff.md",
+      "delivery": "D135 / ARCH-113 workspace-navigation admission boundary",
+      "status": "accepted-with-limits",
+      "owner": "architect",
+      "created_at": "2026-08-12T03:00:00+08:00",
+      "acceptance_ids": [
+        "S179",
+        "D135-AC01"
+      ]
+    },
+    {
+      "id": "2026-08-12-d134-document-save-admission-boundary",
+      "path": "docs/handoffs/2026-08-12-d134-document-save-admission-boundary/handoff.md",
+      "delivery": "D134 / ARCH-112 document-save admission boundary",
+      "status": "accepted-with-limits",
+      "owner": "architect",
+      "created_at": "2026-08-12T02:30:00+08:00",
+      "acceptance_ids": [
+        "S178",
+        "D134-AC01"
+      ]
+    },
+    {
+      "id": "2026-08-12-d133-document-open-admission-boundary",
+      "path": "docs/handoffs/2026-08-12-d133-document-open-admission-boundary/handoff.md",
+      "delivery": "D133 / ARCH-111 document-open admission boundary",
+      "status": "accepted-with-limits",
+      "owner": "architect",
+      "created_at": "2026-08-12T02:00:00+08:00",
+      "acceptance_ids": [
+        "S177",
+        "D133-AC01"
+      ]
+    },
+    {
+      "id": "2026-08-12-ui-67-shell-surface-depth",
+      "path": "docs/handoffs/2026-08-12-ui-67-shell-surface-depth/handoff.md",
+      "delivery": "UI-67 / ARCH-110 shell surface depth and primary-work-area hierarchy",
+      "status": "accepted-with-limits",
+      "owner": "architect",
+      "created_at": "2026-08-12T01:30:00+08:00",
+      "acceptance_ids": [
+        "S176",
+        "UI-67-AC01"
+      ]
+    },
+    {
+      "id": "2026-08-12-d132-recovery-capture-admission-boundary",
+      "path": "docs/handoffs/2026-08-12-d132-recovery-capture-admission-boundary/handoff.md",
+      "delivery": "D132 / ARCH-109 recovery capture admission ports boundary",
+      "status": "accepted-with-limits",
+      "owner": "architect",
+      "created_at": "2026-08-12T01:00:00+08:00",
+      "acceptance_ids": [
+        "S175",
+        "D132-AC01"
+      ]
+    },
+    {
+      "id": "2026-08-11-d131-replace-all-admission-boundary",
+      "path": "docs/handoffs/2026-08-11-d131-replace-all-admission-boundary/handoff.md",
+      "delivery": "D131 / ARCH-108 Replace All admission ports boundary",
+      "status": "accepted-with-limits",
+      "owner": "architect",
+      "created_at": "2026-08-11T23:00:00+08:00",
+      "acceptance_ids": [
+        "S174",
+        "D131-AC01"
+      ]
+    },
+    {
+      "id": "2026-08-11-d130-pure-toolbar-contract-extraction",
+      "path": "docs/handoffs/2026-08-11-d130-pure-toolbar-contract-extraction/handoff.md",
+      "delivery": "D130 / ARCH-107 pure toolbar contract extraction",
+      "status": "accepted-with-limits",
+      "owner": "architect",
+      "created_at": "2026-08-11T22:00:00+08:00",
+      "acceptance_ids": [
+        "S173",
+        "D130-AC01"
+      ]
+    },
+    {
+      "id": "2026-08-11-d129-core-toolbar-composition",
+      "path": "docs/handoffs/2026-08-11-d129-core-toolbar-composition/handoff.md",
+      "delivery": "D129 / ARCH-106 core toolbar composition boundary",
+      "status": "accepted-with-limits",
+      "owner": "architect",
+      "created_at": "2026-08-11T21:00:00+08:00",
+      "acceptance_ids": [
+        "S172",
+        "D129-AC01"
+      ]
+    },
+    {
+      "id": "2026-08-11-d128-core-command-registration",
+      "path": "docs/handoffs/2026-08-11-d128-core-command-registration/handoff.md",
+      "delivery": "D128 / ARCH-105 core command registration boundary",
+      "status": "accepted-with-limits",
+      "owner": "architect",
+      "created_at": "2026-08-11T20:00:00+08:00",
+      "acceptance_ids": [
+        "S171",
+        "D128-AC01"
+      ]
+    },
+    {
+      "id": "2026-08-11-ui-66-editor-stage-rhythm",
+      "path": "docs/handoffs/2026-08-11-ui-66-editor-stage-rhythm/handoff.md",
+      "delivery": "UI-66 / ARCH-104 editor-stage visual rhythm",
+      "status": "accepted-with-limits",
+      "owner": "architect",
+      "created_at": "2026-08-11T19:00:00+08:00",
+      "acceptance_ids": [
+        "S170",
+        "UI-66-AC01"
+      ]
+    },
+    {
+      "id": "2026-08-11-d127-document-tab-removal-ports",
+      "path": "docs/handoffs/2026-08-11-d127-document-tab-removal-ports/handoff.md",
+      "delivery": "D127 / ARCH-103 document-tab removal ports contract",
+      "status": "accepted-with-limits",
+      "owner": "architect",
+      "created_at": "2026-08-11T18:00:00+08:00",
+      "acceptance_ids": [
+        "S169",
+        "D127-AC01"
+      ]
+    },
+    {
+      "id": "2026-08-11-d126-document-tab-creation-ports",
+      "path": "docs/handoffs/2026-08-11-d126-document-tab-creation-ports/handoff.md",
+      "delivery": "D126 / ARCH-102 document-tab creation ports contract",
+      "status": "accepted-with-limits",
+      "owner": "architect",
+      "created_at": "2026-08-11T17:00:00+08:00",
+      "acceptance_ids": [
+        "S168",
+        "D126-AC01"
+      ]
+    },
+    {
+      "id": "2026-08-11-d125-document-open-projection-ports",
+      "path": "docs/handoffs/2026-08-11-d125-document-open-projection-ports/handoff.md",
+      "delivery": "D125 / ARCH-101 document-open projection ports contract",
+      "status": "accepted-with-limits",
+      "owner": "architect",
+      "created_at": "2026-08-11T16:00:00+08:00",
+      "acceptance_ids": [
+        "S167",
+        "D125-AC01"
+      ]
+    },
+    {
+      "id": "2026-08-11-d124-document-save-projection-ports",
+      "path": "docs/handoffs/2026-08-11-d124-document-save-projection-ports/handoff.md",
+      "delivery": "D124 / ARCH-100 document-save projection ports contract",
+      "status": "accepted-with-limits",
+      "owner": "architect",
+      "created_at": "2026-08-11T15:00:00+08:00",
+      "acceptance_ids": [
+        "S166",
+        "D124-AC01"
+      ]
+    },
+    {
+      "id": "2026-08-11-d123-document-save-ports",
+      "path": "docs/handoffs/2026-08-11-d123-document-save-ports/handoff.md",
+      "delivery": "D123 / ARCH-99 document-save ports contract",
+      "status": "accepted-with-limits",
+      "owner": "architect",
+      "created_at": "2026-08-11T14:00:00+08:00",
+      "acceptance_ids": [
+        "S165",
+        "D123-AC01"
+      ]
+    },
+    {
+      "id": "2026-08-11-d122-document-open-ports",
+      "path": "docs/handoffs/2026-08-11-d122-document-open-ports/handoff.md",
+      "delivery": "D122 / ARCH-98 document-open ports contract",
+      "status": "accepted-with-limits",
+      "owner": "architect",
+      "created_at": "2026-08-11T13:00:00+08:00",
+      "acceptance_ids": [
+        "S164",
+        "D122-AC01"
+      ]
+    },
+    {
+      "id": "2026-08-11-d121-close-guard-ports",
+      "path": "docs/handoffs/2026-08-11-d121-close-guard-ports/handoff.md",
+      "delivery": "D121 / ARCH-97 close-guard ports contract",
+      "status": "accepted-with-limits",
+      "owner": "architect",
+      "created_at": "2026-08-11T12:00:00+08:00",
+      "acceptance_ids": [
+        "S163",
+        "D121-AC01"
+      ]
+    },
+    {
+      "id": "2026-08-11-ui-65-semantic-message-tooltip",
+      "path": "docs/handoffs/2026-08-11-ui-65-semantic-message-tooltip/handoff.md",
+      "delivery": "UI-65 / ARCH-96 semantic message and tooltip chrome",
+      "status": "accepted-with-limits",
+      "owner": "architect",
+      "created_at": "2026-08-11T11:00:00+08:00",
+      "acceptance_ids": [
+        "S162",
+        "UI-65-AC01"
+      ]
+    },
+    {
+      "id": "2026-08-11-ui-64-shell-elevation",
+      "path": "docs/handoffs/2026-08-11-ui-64-shell-elevation/handoff.md",
+      "delivery": "UI-64 / ARCH-95 shell elevation and visual rhythm",
+      "status": "accepted-with-limits",
+      "owner": "architect",
+      "created_at": "2026-08-11T10:00:00+08:00",
+      "acceptance_ids": [
+        "S161",
+        "UI-64-AC01"
+      ]
+    },
+    {
+      "id": "2026-08-11-d120-workspace-navigation-ports",
+      "path": "docs/handoffs/2026-08-11-d120-workspace-navigation-ports/handoff.md",
+      "delivery": "D120 / ARCH-94 workspace-navigation ports contract",
+      "status": "accepted-with-limits",
+      "owner": "architect",
+      "created_at": "2026-08-11T09:00:00+08:00",
+      "acceptance_ids": [
+        "S160",
+        "D120-AC01"
+      ]
+    },
+    {
+      "id": "2026-08-11-d119-workspace-file-activation",
+      "path": "docs/handoffs/2026-08-11-d119-workspace-file-activation/handoff.md",
+      "delivery": "D119 / ARCH-93 workspace file activation boundary",
+      "status": "accepted-with-limits",
+      "owner": "architect",
+      "created_at": "2026-08-11T08:00:00+08:00",
+      "acceptance_ids": ["S159", "D119-AC01"]
+    },
+    {
+      "id": "2026-08-11-d118-session-ports-find-close",
+      "path": "docs/handoffs/2026-08-11-d118-session-ports-find-close/handoff.md",
+      "delivery": "D118 / ARCH-92 typed session-restore ports + UI-63 Find close affordance",
+      "status": "accepted-with-limits",
+      "owner": "architect",
+      "created_at": "2026-08-11T07:00:00+08:00",
+      "acceptance_ids": ["S157", "S158", "D118-AC01", "UI-63-AC01"]
+    },
+    {
+      "id": "2026-08-11-d117-operation-reserve",
+      "path": "docs/handoffs/2026-08-11-d117-operation-reserve/handoff.md",
+      "delivery": "D117 / ARCH-91 operation-reserve facade simplification",
+      "status": "accepted-with-limits",
+      "owner": "architect",
+      "created_at": "2026-08-11T06:20:00+08:00",
+      "acceptance_ids": ["S156", "D117-AC01"]
+    },
+    {
+      "id": "2026-08-11-ui-62-tab-close-affordance",
+      "path": "docs/handoffs/2026-08-11-ui-62-tab-close-affordance/handoff.md",
+      "delivery": "UI-62 document tab close-affordance hierarchy",
+      "status": "accepted-with-limits",
+      "owner": "architect",
+      "created_at": "2026-08-11T05:55:00+08:00",
+      "acceptance_ids": ["S155", "UI-62-AC01"]
+    },
+    {
+      "id": "2026-08-11-ui-61-accent-palette",
+      "path": "docs/handoffs/2026-08-11-ui-61-accent-palette/handoff.md",
+      "delivery": "UI-61 accent palette swatch hierarchy",
+      "status": "accepted-with-limits",
+      "owner": "architect",
+      "created_at": "2026-08-11T05:30:00+08:00",
+      "acceptance_ids": ["S154", "UI-61-AC01"]
+    },
+    {
+      "id": "2026-08-11-ui-60-dialog-action-rail",
+      "path": "docs/handoffs/2026-08-11-ui-60-dialog-action-rail/handoff.md",
+      "delivery": "UI-60 dialog action-rail hierarchy",
+      "status": "accepted-with-limits",
+      "owner": "architect",
+      "created_at": "2026-08-11T04:55:00+08:00",
+      "acceptance_ids": ["S153", "UI-60-AC01"]
+    },
+    {
+      "id": "2026-08-11-ui-59-control-affordance",
+      "path": "docs/handoffs/2026-08-11-ui-59-control-affordance/handoff.md",
+      "delivery": "UI-59 control-affordance chrome",
+      "status": "accepted-with-limits",
+      "owner": "architect",
+      "created_at": "2026-08-11T04:25:00+08:00",
+      "acceptance_ids": ["S152", "UI-59-AC01"]
+    },
+    {
+      "id": "2026-08-11-d116-session-save-dispatch",
+      "path": "docs/handoffs/2026-08-11-d116-session-save-dispatch/handoff.md",
+      "delivery": "D116 / ARCH-90 session-save dispatch callback boundary",
+      "status": "accepted-with-limits",
+      "owner": "architect",
+      "created_at": "2026-08-11T03:55:00+08:00",
+      "acceptance_ids": ["S151", "D116-AC01"]
+    },
+    {
+      "id": "2026-08-11-ui-58-dialog-shell",
+      "path": "docs/handoffs/2026-08-11-ui-58-dialog-shell/handoff.md",
+      "delivery": "UI-58 dialog-shell edge hierarchy",
+      "status": "accepted-with-limits",
+      "owner": "architect",
+      "created_at": "2026-08-11T03:20:00+08:00",
+      "acceptance_ids": ["S150", "UI-58-AC01"]
+    },
+    {
+      "id": "2026-08-11-d115-workspace-search-dispatch",
+      "path": "docs/handoffs/2026-08-11-d115-workspace-search-dispatch/handoff.md",
+      "delivery": "D115 / ARCH-89 workspace-search dispatch callback boundary",
+      "status": "accepted-with-limits",
+      "owner": "architect",
+      "created_at": "2026-08-11T02:45:00+08:00",
+      "acceptance_ids": ["S149", "D115-AC01"]
+    },
+    {
+      "id": "2026-08-11-ui-57-workspace-dock",
+      "path": "docs/handoffs/2026-08-11-ui-57-workspace-dock/handoff.md",
+      "delivery": "UI-57 / ARCH-88 workspace-dock chrome hierarchy",
+      "status": "accepted-with-limits",
+      "owner": "architect",
+      "created_at": "2026-08-11T02:15:00+08:00",
+      "acceptance_ids": ["S148", "UI-57-AC01"]
+    },
+    {
+      "id": "2026-08-11-ui-56-command-rail",
+      "path": "docs/handoffs/2026-08-11-ui-56-command-rail/handoff.md",
+      "delivery": "UI-56 / ARCH-87 command-rail visual role hierarchy",
+      "status": "accepted-with-limits",
+      "owner": "architect",
+      "created_at": "2026-08-11T01:45:00+08:00",
+      "acceptance_ids": ["S147", "UI-56-AC01"]
+    },
+    {
+      "id": "2026-08-11-d114-workspace-navigation-dispatch",
+      "path": "docs/handoffs/2026-08-11-d114-workspace-navigation-dispatch/handoff.md",
+      "delivery": "D114 / ARCH-86 workspace-navigation dispatch callback boundary",
+      "status": "accepted-with-limits",
+      "owner": "architect",
+      "created_at": "2026-08-11T01:15:00+08:00",
+      "acceptance_ids": ["S146", "D114-AC01"]
+    },
+    {
+      "id": "2026-08-11-ui-55-settings-field-hierarchy",
+      "path": "docs/handoffs/2026-08-11-ui-55-settings-field-hierarchy/handoff.md",
+      "delivery": "UI-55 settings field hierarchy",
+      "status": "accepted-with-limits",
+      "owner": "architect",
+      "created_at": "2026-08-11T00:55:00+08:00",
+      "acceptance_ids": ["S145", "UI-55-AC01"]
+    },
+    {
+      "id": "2026-08-11-d113-session-load-dispatch",
+      "path": "docs/handoffs/2026-08-11-d113-session-load-dispatch/handoff.md",
+      "delivery": "D113 / ARCH-85 session-load dispatch callback boundary",
+      "status": "accepted-with-limits",
+      "owner": "architect",
+      "created_at": "2026-08-11T00:35:00+08:00",
+      "acceptance_ids": ["S144", "D113-AC01"]
+    },
+    {
+      "id": "2026-08-11-d112-settings-save-dispatch",
+      "path": "docs/handoffs/2026-08-11-d112-settings-save-dispatch/handoff.md",
+      "delivery": "D112 / ARCH-84 settings-save dispatch callback boundary",
+      "status": "accepted-with-limits",
+      "owner": "architect",
+      "created_at": "2026-08-11T00:20:00+08:00",
+      "acceptance_ids": ["S143", "D112-AC01"]
+    },
+    {
+      "id": "2026-08-10-d111-document-open-dispatch",
+      "path": "docs/handoffs/2026-08-10-d111-document-open-dispatch/handoff.md",
+      "delivery": "D111 / ARCH-83 document-open dispatch callback boundary",
+      "status": "accepted-with-limits",
+      "owner": "architect",
+      "created_at": "2026-08-11T00:05:00+08:00",
+      "acceptance_ids": ["S142", "D111-AC01"]
+    },
+    {
+      "id": "2026-08-10-d110-document-save-dispatch",
+      "path": "docs/handoffs/2026-08-10-d110-document-save-dispatch/handoff.md",
+      "delivery": "D110 / ARCH-82 document-save dispatch callback boundary",
+      "status": "accepted-with-limits",
+      "owner": "architect",
+      "created_at": "2026-08-10T23:55:00+08:00",
+      "acceptance_ids": ["S141", "D110-AC01"]
+    },
+    {
+      "id": "2026-08-10-d109-recovery-scan-dispatch",
+      "path": "docs/handoffs/2026-08-10-d109-recovery-scan-dispatch/handoff.md",
+      "delivery": "D109 / ARCH-81 recovery-scan dispatch callback boundary",
+      "status": "accepted-with-limits",
+      "owner": "architect",
+      "created_at": "2026-08-10T23:45:00+08:00",
+      "acceptance_ids": ["S140", "D109-AC01"]
+    },
+    {
+      "id": "2026-08-10-d108-presentation-contract-audit",
+      "path": "docs/handoffs/2026-08-10-d108-presentation-contract-audit/handoff.md",
+      "delivery": "D108 / ARCH-80 cross-module contract/error/observability audit",
+      "status": "accepted-with-limits",
+      "owner": "architect",
+      "created_at": "2026-08-10T23:35:00+08:00",
+      "acceptance_ids": ["S139", "D108-AC01"]
+    },
+    {
+      "id": "2026-08-10-d107-recovery-delete-dispatch",
+      "path": "docs/handoffs/2026-08-10-d107-recovery-delete-dispatch/handoff.md",
+      "delivery": "D107 / ARCH-79 recovery-delete dispatch callback boundary",
+      "status": "accepted-with-limits",
+      "owner": "architect",
+      "created_at": "2026-08-10T23:25:00+08:00",
+      "acceptance_ids": ["S138", "D107-AC01"]
+    },
+    {
+      "id": "2026-08-10-d106-scrollbar-chrome",
+      "path": "docs/handoffs/2026-08-10-d106-scrollbar-chrome/handoff.md",
+      "delivery": "D106 / UI-54 scrollbar chrome",
+      "status": "accepted-with-limits",
+      "owner": "architect",
+      "created_at": "2026-08-10T23:15:00+08:00",
+      "acceptance_ids": ["S137", "UI-54-AC01"]
+    },
+    {
+      "id": "2026-08-10-d105-recovery-write-dispatch",
+      "path": "docs/handoffs/2026-08-10-d105-recovery-write-dispatch/handoff.md",
+      "delivery": "D105 / ARCH-78 recovery-write dispatch callback boundary",
+      "status": "accepted-with-limits",
+      "owner": "architect",
+      "created_at": "2026-08-10T23:05:00+08:00",
+      "acceptance_ids": ["S136", "D105-AC01"]
+    },
+    {
+      "id": "2026-08-10-d104-editor-canvas-tokens",
+      "path": "docs/handoffs/2026-08-10-d104-editor-canvas-tokens/handoff.md",
+      "delivery": "D104 / UI-53 editor canvas token hierarchy",
+      "status": "accepted-with-limits",
+      "owner": "architect",
+      "created_at": "2026-08-10T22:55:00+08:00",
+      "acceptance_ids": ["S135", "UI-53-AC01"]
+    },
+    {
+      "id": "2026-08-10-d103-session-save-request",
+      "path": "docs/handoffs/2026-08-10-d103-session-save-request/handoff.md",
+      "delivery": "D103 / ARCH-77 session-save request and dispatch boundary",
+      "status": "accepted-with-limits",
+      "owner": "architect",
+      "created_at": "2026-08-10T23:59:00+08:00",
+      "acceptance_ids": ["S134", "D103-AC01"]
+    },
+    {
+      "id": "2026-08-10-ui-52-workspace-hierarchy",
+      "path": "docs/handoffs/2026-08-10-ui-52-workspace-hierarchy/handoff.md",
+      "delivery": "UI-52 workspace resource-manager hierarchy",
+      "status": "accepted-with-limits",
+      "owner": "architect",
+      "created_at": "2026-08-10T23:59:00+08:00",
+      "acceptance_ids": ["S133", "UI-52-AC01"]
+    },
+    {
+      "id": "2026-08-10-ui-51-tab-rail",
+      "path": "docs/handoffs/2026-08-10-ui-51-tab-rail/handoff.md",
+      "delivery": "UI-51 document-tab rail state clarity",
+      "status": "accepted-with-limits",
+      "owner": "architect",
+      "created_at": "2026-08-10T23:59:00+08:00",
+      "acceptance_ids": ["S132", "UI-51-AC01"]
+    },
+    {
+      "id": "2026-08-10-d102-close-guard",
+      "path": "docs/handoffs/2026-08-10-d102-close-guard/handoff.md",
+      "delivery": "D102 / ARCH-76 close-readiness coordinator boundary",
+      "status": "accepted-with-limits",
+      "owner": "architect",
+      "created_at": "2026-08-10T23:59:00+08:00",
+      "acceptance_ids": ["S131", "D102-AC01"]
+    },
+    {
+      "id": "2026-08-10-d101-recovery-projection",
+      "path": "docs/handoffs/2026-08-10-d101-recovery-projection/handoff.md",
+      "delivery": "D101 / ARCH-75 recovery-write projection coordinator boundary",
+      "status": "accepted-with-limits",
+      "owner": "architect",
+      "created_at": "2026-08-10T23:59:00+08:00",
+      "acceptance_ids": ["S130", "D101-AC01"]
+    },
+    {
+      "id": "2026-08-10-d100-settings-save-projection",
+      "path": "docs/handoffs/2026-08-10-d100-settings-save-projection/handoff.md",
+      "delivery": "D100 / ARCH-74 settings-save projection coordinator boundary",
+      "status": "accepted-with-limits",
+      "owner": "architect",
+      "created_at": "2026-08-10T23:59:00+08:00",
+      "acceptance_ids": ["S129", "D100-AC01"]
+    },
+    {
+      "id": "2026-08-10-d99-workspace-navigation-projection",
+      "path": "docs/handoffs/2026-08-10-d99-workspace-navigation-projection/handoff.md",
+      "delivery": "D99 / ARCH-73 workspace-navigation projection coordinator boundary",
+      "status": "accepted-with-limits",
+      "owner": "architect",
+      "created_at": "2026-08-10T23:59:00+08:00",
+      "acceptance_ids": ["S128", "D99-AC01"]
+    },
+    {
+      "id": "2026-08-10-d98-document-save-projection",
+      "path": "docs/handoffs/2026-08-10-d98-document-save-projection/handoff.md",
+      "delivery": "D98 / ARCH-72 document-save projection coordinator boundary",
+      "status": "accepted-with-limits",
+      "owner": "architect",
+      "created_at": "2026-08-10T23:59:00+08:00",
+      "acceptance_ids": ["S127", "D98-AC01"]
+    },
+    {
+      "id": "2026-08-10-d97-document-open-projection",
+      "path": "docs/handoffs/2026-08-10-d97-document-open-projection/handoff.md",
+      "delivery": "D97 / ARCH-71 document-open projection coordinator boundary",
+      "status": "accepted-with-limits",
+      "owner": "architect",
+      "created_at": "2026-08-10T23:59:00+08:00",
+      "acceptance_ids": ["S126", "D97-AC01"]
+    },
+    {
+      "id": "2026-08-10-d96-shell-visual-rhythm",
+      "path": "docs/handoffs/2026-08-10-d96-shell-visual-rhythm/handoff.md",
+      "delivery": "D96 / UI-50 shell visual rhythm",
+      "status": "accepted-with-limits",
+      "owner": "architect",
+      "created_at": "2026-08-10T23:59:00+08:00",
+      "acceptance_ids": ["S125", "D96-AC01"]
+    },
+    {
+      "id": "2026-08-10-d95-document-tab-creation",
+      "path": "docs/handoffs/2026-08-10-d95-document-tab-creation/handoff.md",
+      "delivery": "D95 / ARCH-70 document-tab creation coordinator boundary",
+      "status": "accepted-with-limits",
+      "owner": "architect",
+      "created_at": "2026-08-10T23:59:00+08:00",
+      "acceptance_ids": ["S124", "D95-AC01"]
+    },
+    {
+      "id": "2026-08-10-d94-document-tab-removal",
+      "path": "docs/handoffs/2026-08-10-d94-document-tab-removal/handoff.md",
+      "delivery": "D94 / ARCH-69 document-tab removal coordinator boundary",
+      "status": "accepted-with-limits",
+      "owner": "architect",
+      "created_at": "2026-08-10T23:59:00+08:00",
+      "acceptance_ids": ["S123", "D94-AC01"]
+    },
+    {
+      "id": "2026-08-10-d93-recovery-write-finish",
+      "path": "docs/handoffs/2026-08-10-d93-recovery-write-finish/handoff.md",
+      "delivery": "D93 / ARCH-68 recovery-write finish boundary",
+      "status": "accepted-with-limits",
+      "owner": "architect",
+      "created_at": "2026-08-10T23:59:00+08:00",
+      "acceptance_ids": ["S122", "D93-AC01"]
+    },
+    {
+      "id": "2026-08-10-d92-session-restore-coordinator",
+      "path": "docs/handoffs/2026-08-10-d92-session-restore-coordinator/handoff.md",
+      "delivery": "D92 / ARCH-67 session-restore coordinator boundary",
+      "status": "accepted-with-limits",
+      "owner": "architect",
+      "created_at": "2026-08-10T23:59:00+08:00",
+      "acceptance_ids": ["S121", "D92-AC01"]
+    },
+    {
+      "id": "2026-08-10-d91-recovery-capture-abort-coordinator",
+      "path": "docs/handoffs/2026-08-10-d91-recovery-capture-abort-coordinator/handoff.md",
+      "delivery": "D91 / ARCH-66 recovery-capture abort coordinator boundary",
+      "status": "accepted-with-limits",
+      "owner": "architect",
+      "created_at": "2026-08-10T23:59:00+08:00",
+      "acceptance_ids": ["S120", "D91-AC01"]
+    },
+    {
+      "id": "2026-08-10-d90-recovery-write-coordinator",
+      "path": "docs/handoffs/2026-08-10-d90-recovery-write-coordinator/handoff.md",
+      "delivery": "D90 / ARCH-65 recovery-write coordinator boundary",
+      "status": "accepted-with-limits",
+      "owner": "architect",
+      "created_at": "2026-08-10T23:59:00+08:00",
+      "acceptance_ids": ["S119", "D90-AC01"]
+    },
+    {
+      "id": "2026-08-10-d89-replace-all-coordinator",
+      "path": "docs/handoffs/2026-08-10-d89-replace-all-coordinator/handoff.md",
+      "delivery": "D89 / ARCH-64 Replace All completion coordinator boundary",
+      "status": "accepted-with-limits",
+      "owner": "architect",
+      "created_at": "2026-08-10T23:59:00+08:00",
+      "acceptance_ids": ["S118", "D89-AC01"]
+    },
+    {
+      "id": "2026-08-10-d88-recovery-delete-coordinator",
+      "path": "docs/handoffs/2026-08-10-d88-recovery-delete-coordinator/handoff.md",
+      "delivery": "D88 / ARCH-63 recovery-delete coordinator boundary",
+      "status": "accepted-with-limits",
+      "owner": "architect",
+      "created_at": "2026-08-10T23:59:00+08:00",
+      "acceptance_ids": ["S117", "D88-AC01"]
+    },
+    {
+      "id": "2026-08-10-d87-document-save-coordinator",
+      "path": "docs/handoffs/2026-08-10-d87-document-save-coordinator/handoff.md",
+      "delivery": "D87 / ARCH-62 document-save coordinator boundary",
+      "status": "accepted-with-limits",
+      "owner": "architect",
+      "created_at": "2026-08-10T23:59:00+08:00",
+      "acceptance_ids": ["S116", "D87-AC01"]
+    },
+    {
+      "id": "2026-08-10-d86-document-open-coordinator",
+      "path": "docs/handoffs/2026-08-10-d86-document-open-coordinator/handoff.md",
+      "delivery": "D86 / ARCH-61 document-open coordinator boundary",
+      "status": "accepted-with-limits",
+      "owner": "architect",
+      "created_at": "2026-08-10T23:59:00+08:00",
+      "acceptance_ids": ["S115", "D86-AC01"]
+    },
+    {
+      "id": "2026-08-10-d85-workspace-navigation-coordinator",
+      "path": "docs/handoffs/2026-08-10-d85-workspace-navigation-coordinator/handoff.md",
+      "delivery": "D85 / ARCH-60 workspace-navigation coordinator boundary",
+      "status": "accepted-with-limits",
+      "owner": "architect",
+      "created_at": "2026-08-10T23:59:00+08:00",
+      "acceptance_ids": ["S114", "D85-AC01"]
+    },
+    {
+      "id": "2026-08-10-d84-workspace-search-coordinator",
+      "path": "docs/handoffs/2026-08-10-d84-workspace-search-coordinator/handoff.md",
+      "delivery": "D84 / ARCH-59 workspace-search coordinator boundary",
+      "status": "accepted-with-limits",
+      "owner": "architect",
+      "created_at": "2026-08-10T23:59:00+08:00",
+      "acceptance_ids": ["S113", "D84-AC01"]
+    },
+    {
+      "id": "2026-08-10-d83-settings-save-coordinator",
+      "path": "docs/handoffs/2026-08-10-d83-settings-save-coordinator/handoff.md",
+      "delivery": "D83 / ARCH-58 settings-save coordinator boundary",
+      "status": "accepted-with-limits",
+      "owner": "architect",
+      "created_at": "2026-08-10T23:59:00+08:00",
+      "acceptance_ids": ["S112", "D83-AC01"]
+    },
+    {
+      "id": "2026-08-10-d82-session-save-coordinator",
+      "path": "docs/handoffs/2026-08-10-d82-session-save-coordinator/handoff.md",
+      "delivery": "D82 / ARCH-57 session-save coordinator boundary",
+      "status": "accepted-with-limits",
+      "owner": "architect",
+      "created_at": "2026-08-10T23:59:00+08:00",
+      "acceptance_ids": ["S111", "D82-AC01"]
+    },
+    {
+      "id": "2026-08-10-d81-recovery-scan-coordinator",
+      "path": "docs/handoffs/2026-08-10-d81-recovery-scan-coordinator/handoff.md",
+      "delivery": "D81 / ARCH-56 recovery-scan coordinator boundary",
+      "status": "accepted-with-limits",
+      "owner": "architect",
+      "created_at": "2026-08-10T23:59:00+08:00",
+      "acceptance_ids": ["S110", "D81-AC01"]
+    },
+    {
+      "id": "2026-08-10-d80-session-load-coordinator",
+      "path": "docs/handoffs/2026-08-10-d80-session-load-coordinator/handoff.md",
+      "delivery": "D80 / ARCH-55 session-load coordinator boundary",
+      "status": "accepted-with-limits",
+      "owner": "architect",
+      "created_at": "2026-08-10T23:59:00+08:00",
+      "acceptance_ids": ["S109", "D80-AC01"]
+    },
+    {
+      "id": "2026-08-10-d79-plugin-runtime-coordinator",
+      "path": "docs/handoffs/2026-08-10-d79-plugin-runtime-coordinator/handoff.md",
+      "delivery": "D79 / ARCH-54 plugin runtime coordinator boundary",
+      "status": "accepted-with-limits",
+      "owner": "architect",
+      "created_at": "2026-08-10T23:59:00+08:00",
+      "acceptance_ids": ["S108", "D79-AC01"]
+    },
+    {
+      "id": "2026-08-10-d78-plugin-host-probe-coordinator",
+      "path": "docs/handoffs/2026-08-10-d78-plugin-host-probe-coordinator/handoff.md",
+      "delivery": "D78 / ARCH-53 plugin-host probe coordinator boundary",
+      "status": "accepted-with-limits",
+      "owner": "architect",
+      "created_at": "2026-08-10T23:59:00+08:00",
+      "acceptance_ids": ["S107", "D78-AC01"]
+    },
+    {
+      "id": "2026-08-10-d77-plugin-catalog-coordinator",
+      "path": "docs/handoffs/2026-08-10-d77-plugin-catalog-coordinator/handoff.md",
+      "delivery": "D77 / ARCH-52 plugin catalog coordinator boundary",
+      "status": "accepted-with-limits",
+      "owner": "architect",
+      "created_at": "2026-08-10T23:59:00+08:00",
+      "acceptance_ids": ["S106", "D77-AC01"]
+    },
+    {
+      "id": "2026-08-10-d76-recovery-notification-localization",
+      "path": "docs/handoffs/2026-08-10-d76-recovery-notification-localization/handoff.md",
+      "delivery": "D76 / UI-49 recovery notification dynamic localization",
+      "status": "accepted-with-limits",
+      "owner": "architect",
+      "created_at": "2026-08-10T23:59:00+08:00",
+      "acceptance_ids": ["S105", "D76-AC01"]
+    },
+    {
+      "id": "2026-08-10-d75-workspace-search-hierarchy",
+      "path": "docs/handoffs/2026-08-10-d75-workspace-search-hierarchy/handoff.md",
+      "delivery": "D75 / UI-48 workspace-search visual hierarchy",
+      "status": "accepted-with-limits",
+      "owner": "architect",
+      "created_at": "2026-08-10T23:59:00+08:00",
+      "acceptance_ids": ["S104", "D75-AC01"]
+    },
+    {
+      "id": "2026-08-10-d74-settings-preview-surface",
+      "path": "docs/handoffs/2026-08-10-d74-settings-preview-surface/handoff.md",
+      "delivery": "D74 / UI-47 settings preview surface boundary",
+      "status": "accepted-with-limits",
+      "owner": "architect",
+      "created_at": "2026-08-10T23:59:00+08:00",
+      "acceptance_ids": ["S103", "D74-AC01"]
+    },
+    {
+      "id": "2026-08-10-d73-settings-preview",
+      "path": "docs/handoffs/2026-08-10-d73-settings-preview/handoff.md",
+      "delivery": "D73 / UI-46 settings appearance preview",
+      "status": "accepted-with-limits",
+      "owner": "architect",
+      "created_at": "2026-08-10T23:59:00+08:00",
+      "acceptance_ids": ["S102", "D73-AC01"]
+    },
+    {
+      "id": "2026-08-10-d72-plugin-dialog-hierarchy",
+      "path": "docs/handoffs/2026-08-10-d72-plugin-dialog-hierarchy/handoff.md",
+      "delivery": "D72 / UI-45 plugin-dialog visual hierarchy",
+      "status": "accepted-with-limits",
+      "owner": "architect",
+      "created_at": "2026-08-10T23:59:00+08:00",
+      "acceptance_ids": ["S101", "D72-AC01"]
+    },
+    {
+      "id": "2026-08-10-d71-plugin-status-boolean-locale",
+      "path": "docs/handoffs/2026-08-10-d71-plugin-status-boolean-locale/handoff.md",
+      "delivery": "D71 / UI-44 plugin status boolean locale projection",
+      "status": "accepted-with-limits",
+      "owner": "architect",
+      "created_at": "2026-08-10T23:59:00+08:00",
+      "acceptance_ids": ["S100", "D71-AC01"]
+    },
+    {
+      "id": "2026-08-10-d70-plugin-catalog-locale",
+      "path": "docs/handoffs/2026-08-10-d70-plugin-catalog-locale/handoff.md",
+      "delivery": "D70 / UI-43 plugin catalog locale projection",
+      "status": "accepted-with-limits",
+      "owner": "architect",
+      "created_at": "2026-08-10T23:59:00+08:00",
+      "acceptance_ids": ["S99", "D70-AC01"]
+    },
+    {
+      "id": "2026-08-10-d69-notification-localization-closure",
+      "path": "docs/handoffs/2026-08-10-d69-notification-localization-closure/handoff.md",
+      "delivery": "D69 / UI-42 notification localization closure",
+      "status": "accepted-with-limits",
+      "owner": "architect",
+      "created_at": "2026-08-10T23:59:00+08:00",
+      "acceptance_ids": ["S98", "D69-AC01"]
+    },
+    {
+      "id": "2026-08-10-d68-message-dialog-hierarchy",
+      "path": "docs/handoffs/2026-08-10-d68-message-dialog-hierarchy/handoff.md",
+      "delivery": "D68 / UI-41 message-dialog visual hierarchy",
+      "status": "accepted-with-limits",
+      "owner": "architect",
+      "created_at": "2026-08-10T23:59:00+08:00",
+      "acceptance_ids": ["S97", "D68-AC01"]
+    },
+    {
+      "id": "2026-08-10-d67-mainwindow-forwarding-simplification",
+      "path": "docs/handoffs/2026-08-10-d67-mainwindow-forwarding-simplification/handoff.md",
+      "delivery": "D67 / ARCH-51 MainWindow file-dialog/About forwarding simplification",
+      "status": "accepted-with-limits",
+      "owner": "architect",
+      "created_at": "2026-08-10T23:55:00+08:00",
+      "acceptance_ids": ["S96", "D67-AC01"]
+    },
+    {
+      "id": "2026-08-10-d66-dialog-action-hierarchy",
+      "path": "docs/handoffs/2026-08-10-d66-dialog-action-hierarchy/handoff.md",
+      "delivery": "D66 / UI-40 dialog action hierarchy",
+      "status": "accepted-with-limits",
+      "owner": "architect",
+      "created_at": "2026-08-10T23:45:00+08:00",
+      "acceptance_ids": ["S95", "D66-AC01"]
+    },
+    {
+      "id": "2026-08-10-d65-document-tab-forwarding",
+      "path": "docs/handoffs/2026-08-10-d65-document-tab-forwarding/handoff.md",
+      "delivery": "D65 / ARCH-50 document-tab forwarding simplification",
+      "status": "accepted-with-limits",
+      "owner": "architect",
+      "created_at": "2026-08-10T23:30:00+08:00",
+      "acceptance_ids": ["S94", "D65-AC01"]
+    },
+    {
+      "id": "2026-08-10-d64-settings-control-hierarchy",
+      "path": "docs/handoffs/2026-08-10-d64-settings-control-hierarchy/handoff.md",
+      "delivery": "D64 / UI-39 settings control hierarchy",
+      "status": "accepted-with-limits",
+      "owner": "architect",
+      "created_at": "2026-08-10T23:00:00+08:00",
+      "acceptance_ids": ["S93", "D64-AC01"]
+    },
+    {
+      "id": "2026-08-10-d63-toolbar-context-chip",
+      "path": "docs/handoffs/2026-08-10-d63-toolbar-context-chip/handoff.md",
+      "delivery": "D63 / UI-38 toolbar context chip",
+      "status": "accepted-with-limits",
+      "owner": "architect",
+      "created_at": "2026-08-10T22:00:00+08:00",
+      "acceptance_ids": ["S92", "D63-AC01"]
+    },
+    {
+      "id": "2026-08-10-d62-findbar-action-hierarchy",
+      "path": "docs/handoffs/2026-08-10-d62-findbar-action-hierarchy/handoff.md",
+      "delivery": "D62 / UI-37 find-bar action hierarchy",
+      "status": "accepted-with-limits",
+      "owner": "architect",
+      "created_at": "2026-08-10T21:00:00+08:00",
+      "acceptance_ids": ["S91", "D62-AC01"]
+    },
+    {
+      "id": "2026-08-10-d61-session-snapshot-builder",
+      "path": "docs/handoffs/2026-08-10-d61-session-snapshot-builder/handoff.md",
+      "delivery": "D61 / ARCH-49 session-snapshot capture boundary",
+      "status": "accepted-with-limits",
+      "owner": "architect",
+      "created_at": "2026-08-10T20:00:00+08:00",
+      "acceptance_ids": ["S90", "D61-AC01"]
+    },
+    {
+      "id": "2026-08-10-d60-ui-36-tab-selection",
+      "path": "docs/handoffs/2026-08-10-d60-ui-36-tab-selection/handoff.md",
+      "delivery": "D60 / UI-36 document-tab selection hierarchy",
+      "status": "accepted-with-limits",
+      "owner": "architect",
+      "created_at": "2026-08-10T19:00:00+08:00",
+      "acceptance_ids": ["S89", "D60-AC01"]
+    },
+    {
+      "id": "2026-08-10-d59-status-phase-forwarding",
+      "path": "docs/handoffs/2026-08-10-d59-status-phase-forwarding/handoff.md",
+      "delivery": "D59 / ARCH-48 status-phase forwarding simplification",
+      "status": "accepted-with-limits",
+      "owner": "architect",
+      "created_at": "2026-08-10T18:00:00+08:00",
+      "acceptance_ids": ["S88", "D59-AC01"]
+    },
+    {
+      "id": "2026-08-10-d58-session-load-state-simplification",
+      "path": "docs/handoffs/2026-08-10-d58-session-load-state-simplification/handoff.md",
+      "delivery": "D58 / ARCH-47 session-load coordinator state simplification",
+      "status": "accepted-with-limits",
+      "owner": "architect",
+      "created_at": "2026-08-10T17:00:00+08:00",
+      "acceptance_ids": ["S87", "D58-AC01"]
+    },
+    {
+      "id": "2026-08-10-d57-session-restore-tab-projection",
+      "path": "docs/handoffs/2026-08-10-d57-session-restore-tab-projection/handoff.md",
+      "delivery": "D57 / ARCH-46 session-restore tab projection boundary",
+      "status": "accepted-with-limits",
+      "owner": "architect",
+      "created_at": "2026-08-10T16:00:00+08:00",
+      "acceptance_ids": ["S86", "D57-AC01"]
+    },
+    {
+      "id": "2026-08-10-d56-document-tab-path-identity",
+      "path": "docs/handoffs/2026-08-10-d56-document-tab-path-identity/handoff.md",
+      "delivery": "D56 / ARCH-45 document-tab path identity boundary",
+      "status": "accepted-with-limits",
+      "owner": "architect",
+      "created_at": "2026-08-10T15:00:00+08:00",
+      "acceptance_ids": ["S85", "D56-AC01"]
+    },
+    {
+      "id": "2026-08-10-ui-35-warning-foreground",
+      "path": "docs/handoffs/2026-08-10-ui-35-warning-foreground/handoff.md",
+      "delivery": "D55 / UI-35 warning-background foreground contract",
+      "status": "accepted-with-limits",
+      "owner": "architect",
+      "created_at": "2026-08-10T14:20:00+08:00",
+      "acceptance_ids": ["S84", "D55-AC01"]
+    },
+    {
+      "id": "2026-08-11-d54-recovery-scan-state",
+      "path": "docs/handoffs/2026-08-11-d54-recovery-scan-state/handoff.md",
+      "delivery": "D54 / ARCH-44 Recovery Scan lifecycle boundary",
+      "status": "accepted-with-limits",
+      "owner": "architect",
+      "created_at": "2026-08-11T13:00:00+08:00",
+      "acceptance_ids": ["S83", "D54-AC01"]
+    },
+    {
+      "id": "2026-08-11-d53-find-match-state",
+      "path": "docs/handoffs/2026-08-11-d53-find-match-state/handoff.md",
+      "delivery": "D53 / ARCH-43 Find Match snapshot boundary",
+      "status": "accepted-with-limits",
+      "owner": "architect",
+      "created_at": "2026-08-11T12:00:00+08:00",
+      "acceptance_ids": ["S82", "D53-AC01"]
+    },
+    {
+      "id": "2026-08-11-d52-replace-all-state",
+      "path": "docs/handoffs/2026-08-11-d52-replace-all-state/handoff.md",
+      "delivery": "D52 / ARCH-42 Replace All lifecycle boundary",
+      "status": "accepted-with-limits",
+      "owner": "architect",
+      "created_at": "2026-08-11T11:00:00+08:00",
+      "acceptance_ids": ["S81", "D52-AC01"]
+    },
+    {
+      "id": "2026-08-11-d51-settings-save",
+      "path": "docs/handoffs/2026-08-11-d51-settings-save/handoff.md",
+      "delivery": "D51 / ARCH-41 Settings-save callback boundary",
+      "status": "accepted-with-limits",
+      "owner": "architect",
+      "created_at": "2026-08-11T10:00:00+08:00",
+      "acceptance_ids": ["S80", "D51-AC01"]
+    },
+    {
+      "id": "2026-08-11-d50-recovery-capture",
+      "path": "docs/handoffs/2026-08-11-d50-recovery-capture/handoff.md",
+      "delivery": "D50 / ARCH-40 Recovery-capture lifecycle boundary",
+      "status": "accepted-with-limits",
+      "owner": "architect",
+      "created_at": "2026-08-11T09:00:00+08:00",
+      "acceptance_ids": ["S79", "D50-AC01"]
+    },
+    {
+      "id": "2026-08-11-d49-session-save-state",
+      "path": "docs/handoffs/2026-08-11-d49-session-save-state/handoff.md",
+      "delivery": "D49 / ARCH-39 Session-save state boundary",
+      "status": "accepted-with-limits",
+      "owner": "architect",
+      "created_at": "2026-08-11T08:00:00+08:00",
+      "acceptance_ids": ["S78", "D49-AC01"]
+    },
+    {
+      "id": "2026-08-11-d48-document-tab-state",
+      "path": "docs/handoffs/2026-08-11-d48-document-tab-state/handoff.md",
+      "delivery": "D48 / ARCH-38 / UI-34 Document-tab state clarity",
+      "status": "accepted-with-limits",
+      "owner": "architect",
+      "created_at": "2026-08-11T07:00:00+08:00",
+      "acceptance_ids": ["S77", "D48-AC01"]
+    },
+    {
+      "id": "2026-08-11-d47-session-restore-state",
+      "path": "docs/handoffs/2026-08-11-d47-session-restore-state/handoff.md",
+      "delivery": "D47 / ARCH-37 / UI-33 Session-restore state boundary",
+      "status": "accepted-with-limits",
+      "owner": "architect",
+      "created_at": "2026-08-11T06:30:00+08:00",
+      "acceptance_ids": ["S76", "D47-AC01"]
+    },
+    {
+      "id": "2026-08-11-d46-workspace-tree-visual-rhythm",
+      "path": "docs/handoffs/2026-08-11-d46-workspace-tree-visual-rhythm/handoff.md",
+      "delivery": "D46 / ARCH-36 / UI-32 Workspace tree visual rhythm",
+      "status": "accepted-with-limits",
+      "owner": "architect",
+      "created_at": "2026-08-11T05:30:00+08:00",
+      "acceptance_ids": ["S75", "D46-AC01"]
+    },
+    {
+      "id": "2026-08-11-d45-workspace-file-activation",
+      "path": "docs/handoffs/2026-08-11-d45-workspace-file-activation/handoff.md",
+      "delivery": "D45 / ARCH-35 / UI-31 Workspace file activation consistency",
+      "status": "accepted-with-limits",
+      "owner": "architect",
+      "created_at": "2026-08-11T04:30:00+08:00",
+      "acceptance_ids": ["S74", "D45-AC01"]
+    },
+    {
+      "id": "2026-08-11-d44-workspace-navigation-lifecycle",
+      "path": "docs/handoffs/2026-08-11-d44-workspace-navigation-lifecycle/handoff.md",
+      "delivery": "D44 / ARCH-34 / UI-30 Workspace-navigation lifecycle boundary",
+      "status": "accepted-with-limits",
+      "owner": "architect",
+      "created_at": "2026-08-11T03:30:00+08:00",
+      "acceptance_ids": ["S73", "D44-AC01"]
+    },
+    {
+      "id": "2026-08-11-d43-workspace-search-lifecycle",
+      "path": "docs/handoffs/2026-08-11-d43-workspace-search-lifecycle/handoff.md",
+      "delivery": "D43 / ARCH-33 / UI-29 Workspace-search lifecycle boundary",
+      "status": "accepted-with-limits",
+      "owner": "architect",
+      "created_at": "2026-08-11T02:30:00+08:00",
+      "acceptance_ids": ["S72", "D43-AC01"]
+    },
+    {
+      "id": "2026-08-11-d42-workspace-action-hierarchy",
+      "path": "docs/handoffs/2026-08-11-d42-workspace-action-hierarchy/handoff.md",
+      "delivery": "D42 / ARCH-32 / UI-28 Workspace action hierarchy",
+      "status": "accepted-with-limits",
+      "owner": "architect",
+      "created_at": "2026-08-11T01:30:00+08:00",
+      "acceptance_ids": ["S71", "D42-AC01"]
+    },
+    {
+      "id": "2026-08-11-d41-workspace-entry-activation",
+      "path": "docs/handoffs/2026-08-11-d41-workspace-entry-activation/handoff.md",
+      "delivery": "D41 / ARCH-31 / UI-27 Workspace entry activation",
+      "status": "accepted-with-limits",
+      "owner": "architect",
+      "created_at": "2026-08-11T00:30:00+08:00",
+      "acceptance_ids": ["S70", "D41-AC01"]
+    },
+    {
+      "id": "2026-08-10-d40-plugin-operation-state",
+      "path": "docs/handoffs/2026-08-10-d40-plugin-operation-state/handoff.md",
+      "delivery": "D40 / ARCH-30 / UI-26 Plugin operation-state boundary",
+      "status": "accepted-with-limits",
+      "owner": "architect",
+      "created_at": "2026-08-10T23:59:00+08:00",
+      "acceptance_ids": ["S69", "D40-AC01"]
+    },
+    {
+      "id": "2026-08-10-d39-operation-tracker",
+      "path": "docs/handoffs/2026-08-10-d39-operation-tracker/handoff.md",
+      "delivery": "D39 / ARCH-29 / UI-25 MainWindow operation-tracker boundary",
+      "status": "accepted-with-limits",
+      "owner": "architect",
+      "created_at": "2026-08-10T23:59:00+08:00",
+      "acceptance_ids": ["S68", "D39-AC01"]
+    },
+    {
+      "id": "2026-08-10-d38-focus-state-visibility",
+      "path": "docs/handoffs/2026-08-10-d38-focus-state-visibility/handoff.md",
+      "delivery": "D38 / UI-24 Focus-state visibility",
+      "status": "accepted-with-limits",
+      "owner": "architect",
+      "created_at": "2026-08-10T23:59:00+08:00",
+      "acceptance_ids": ["S67", "D38-AC01"]
+    },
+    {
+      "id": "2026-08-10-d37a-notification-contract-closure",
+      "path": "docs/handoffs/2026-08-10-d37a-notification-contract-closure/handoff.md",
+      "delivery": "D37a / UI-23 MainWindow notification contract closure",
+      "status": "accepted-with-limits",
+      "owner": "architect",
+      "created_at": "2026-08-10T23:59:00+08:00",
+      "acceptance_ids": ["S66", "D37A-AC01"]
+    },
+    {
+      "id": "2026-08-10-d36a-workspace-notification-severity",
+      "path": "docs/handoffs/2026-08-10-d36a-workspace-notification-severity/handoff.md",
+      "delivery": "D36a / UI-22 Workspace and operation notification severity closure",
+      "status": "accepted-with-limits",
+      "owner": "architect",
+      "created_at": "2026-08-10T23:45:00+08:00",
+      "acceptance_ids": ["S65", "D36A-AC01"]
+    },
+    {
+      "id": "2026-08-10-d35a-plugin-notification-severity",
+      "path": "docs/handoffs/2026-08-10-d35a-plugin-notification-severity/handoff.md",
+      "delivery": "D35a / UI-21 Plugin and extension notification severity closure",
+      "status": "accepted-with-limits",
+      "owner": "architect",
+      "created_at": "2026-08-10T23:20:00+08:00",
+      "acceptance_ids": ["S64", "D35A-AC01"]
+    },
+    {
+      "id": "2026-08-10-d34a-session-recovery-severity",
+      "path": "docs/handoffs/2026-08-10-d34a-session-recovery-severity/handoff.md",
+      "delivery": "D34a / UI-20 Session/Recovery notification severity closure",
+      "status": "accepted-with-limits",
+      "owner": "architect",
+      "created_at": "2026-08-10T22:30:00+08:00",
+      "acceptance_ids": ["S63", "D34A-AC01"]
+    },
+    {
+      "id": "2026-08-10-d33-findbar-feedback",
+      "path": "docs/handoffs/2026-08-10-d33-findbar-feedback/handoff.md",
+      "delivery": "D33 / UI-19 FindBar semantic feedback projection",
+      "status": "accepted-with-limits",
+      "owner": "architect",
+      "created_at": "2026-08-10T22:00:00+08:00",
+      "acceptance_ids": ["S62", "D33-AC01"]
+    },
+    {
+      "id": "2026-08-10-d32a-inline-feedback",
+      "path": "docs/handoffs/2026-08-10-d32a-inline-feedback/handoff.md",
+      "delivery": "D32a / UI-18 inline workspace feedback hierarchy",
+      "status": "accepted-with-limits",
+      "owner": "architect",
+      "created_at": "2026-08-10T21:30:00+08:00",
+      "acceptance_ids": ["S61", "D32A-AC01"]
+    },
+    {
+      "id": "2026-08-10-d31-semantic-notifications",
+      "path": "docs/handoffs/2026-08-10-d31-semantic-notifications/handoff.md",
+      "delivery": "D31 / UI-17 semantic transient notification hierarchy",
+      "status": "accepted-with-limits",
+      "owner": "architect",
+      "created_at": "2026-08-10T21:00:00+08:00",
+      "acceptance_ids": ["S60", "D31-AC01"]
+    },
+    {
+      "id": "2026-08-10-d30-authored-icons",
+      "path": "docs/handoffs/2026-08-10-d30-authored-icons/handoff.md",
+      "delivery": "D30 / UI-16",
+      "status": "accepted-with-limits",
+      "owner": "architect",
+      "created_at": "2026-08-10T20:30:00+08:00",
+      "acceptance_ids": ["S59", "D30-AC01"]
+    },
+    {
+      "id": "2026-08-10-d29-visual-tokens",
+      "path": "docs/handoffs/2026-08-10-d29-visual-tokens/handoff.md",
+      "delivery": "D29 / UI-15 visual endpoint contrast and shell rhythm",
+      "status": "accepted-with-limits",
+      "owner": "architect",
+      "created_at": "2026-08-10T19:30:00+08:00",
+      "acceptance_ids": ["D29-AC01", "S58"]
+    },
+    {
+      "id": "2026-08-10-d28-editor-document",
+      "path": "docs/handoffs/2026-08-10-d28-editor-document/handoff.md",
+      "delivery": "D28 / ARCH-19 editor document surface",
+      "status": "accepted-with-limits",
+      "owner": "architect",
+      "created_at": "2026-08-10T19:00:00+08:00",
+      "acceptance_ids": ["D28-AC01", "S57"]
+    },
+    {
+      "id": "2026-08-10-d27-editor-shell",
+      "path": "docs/handoffs/2026-08-10-d27-editor-shell/handoff.md",
+      "delivery": "D27 / ARCH-18 central editor shell surface",
+      "status": "accepted-with-limits",
+      "owner": "architect",
+      "created_at": "2026-08-10T18:30:00+08:00",
+      "acceptance_ids": ["D27-AC01", "S56"]
+    },
+    {
+      "id": "2026-08-10-d26-status-surface-host",
+      "path": "docs/handoffs/2026-08-10-d26-status-surface-host/handoff.md",
+      "delivery": "D26 / ARCH-17 status surface host projection",
+      "status": "accepted-with-limits",
+      "owner": "architect",
+      "created_at": "2026-08-10T18:00:00+08:00",
+      "acceptance_ids": ["D26-AC01", "S55"]
+    },
+    {
+      "id": "2026-08-10-d25-theme-transition",
+      "path": "docs/handoffs/2026-08-10-d25-theme-transition/handoff.md",
+      "delivery": "D25 / ARCH-16 theme transition surface",
+      "status": "accepted-with-limits",
+      "owner": "architect",
+      "created_at": "2026-08-10T17:30:00+08:00",
+      "acceptance_ids": ["D25-AC01", "S54"]
+    },
+    {
+      "id": "2026-08-10-d24-message-surface",
+      "path": "docs/handoffs/2026-08-10-d24-message-surface/handoff.md",
+      "delivery": "D24 / ARCH-15 MainWindow message surface",
+      "status": "accepted-with-limits",
+      "owner": "architect",
+      "created_at": "2026-08-10T17:00:00+08:00",
+      "acceptance_ids": ["D24-AC01", "S53"]
+    },
+    {
+      "id": "2026-08-10-d23-plugin-surface",
+      "path": "docs/handoffs/2026-08-10-d23-plugin-surface/handoff.md",
+      "delivery": "D23 / ARCH-14 MainWindow plugin surface",
+      "status": "accepted-with-limits",
+      "owner": "architect",
+      "created_at": "2026-08-10T16:30:00+08:00",
+      "acceptance_ids": ["D23-AC01", "S52"]
+    },
+    {
+      "id": "2026-08-10-d22-command-palette-surface",
+      "path": "docs/handoffs/2026-08-10-d22-command-palette-surface/handoff.md",
+      "delivery": "D22 / ARCH-13 MainWindow command-palette surface",
+      "status": "accepted-with-limits",
+      "owner": "architect",
+      "created_at": "2026-08-10T16:00:00+08:00",
+      "acceptance_ids": ["D22-AC01", "S51"]
+    },
+    {
+      "id": "2026-08-10-d21-file-dialog-surface",
+      "path": "docs/handoffs/2026-08-10-d21-file-dialog-surface/handoff.md",
+      "delivery": "D21 / ARCH-12 MainWindow file-dialog surface",
+      "status": "accepted-with-limits",
+      "owner": "architect",
+      "created_at": "2026-08-10T15:30:00+08:00",
+      "acceptance_ids": ["D21-AC01", "S50"]
+    },
+    {
+      "id": "2026-08-10-d20-status-surface",
+      "path": "docs/handoffs/2026-08-10-d20-status-surface/handoff.md",
+      "delivery": "D20 / ARCH-11 MainWindow status surface",
+      "status": "accepted-with-limits",
+      "owner": "architect",
+      "created_at": "2026-08-10T15:00:00+08:00",
+      "acceptance_ids": ["D20-AC01", "S49"]
+    },
+    {
+      "id": "2026-08-10-d19-recovery-prompt-surface",
+      "path": "docs/handoffs/2026-08-10-d19-recovery-prompt-surface/handoff.md",
+      "delivery": "D19 / ARCH-10 MainWindow recovery prompt surface",
+      "status": "accepted-with-limits",
+      "owner": "architect",
+      "created_at": "2026-08-10T14:00:00+08:00",
+      "acceptance_ids": ["D19-AC01", "S48"]
+    },
+    {
+      "id": "2026-08-10-d18-settings-surface",
+      "path": "docs/handoffs/2026-08-10-d18-settings-surface/handoff.md",
+      "delivery": "D18 / ARCH-09 MainWindow settings surface coordinator",
+      "status": "accepted-with-limits",
+      "owner": "architect",
+      "created_at": "2026-08-10T13:00:00+08:00",
+      "acceptance_ids": ["D18-AC01", "S47"]
+    },
+    {
+      "id": "2026-08-10-d17-find-surface",
+      "path": "docs/handoffs/2026-08-10-d17-find-surface/handoff.md",
+      "delivery": "D17 / ARCH-08 MainWindow Find surface coordinator",
+      "status": "accepted-with-limits",
+      "owner": "architect",
+      "created_at": "2026-08-10T12:00:00+08:00",
+      "acceptance_ids": ["D17-AC01", "S46"]
+    },
+    {
+      "id": "2026-08-10-d16-workspace-projection-closure",
+      "path": "docs/handoffs/2026-08-10-d16-workspace-projection-closure/handoff.md",
+      "delivery": "D16 / ARCH-07 MainWindow workspace projection-boundary closure",
+      "status": "accepted-with-limits",
+      "owner": "architect",
+      "created_at": "2026-08-10T11:00:00+08:00",
+      "acceptance_ids": ["D16-AC01", "S45"]
+    },
+    {
+      "id": "2026-08-10-d15-workspace-search-surface",
+      "path": "docs/handoffs/2026-08-10-d15-workspace-search-surface/handoff.md",
+      "delivery": "D15 / ARCH-06 MainWindow workspace-search surface coordinator",
+      "status": "accepted-with-limits",
+      "owner": "architect",
+      "created_at": "2026-08-10T10:00:00+08:00",
+      "acceptance_ids": ["D15-AC01", "S44"]
+    },
+    {
+      "id": "2026-08-10-d14-workspace-surface",
+      "path": "docs/handoffs/2026-08-10-d14-workspace-surface/handoff.md",
+      "delivery": "D14 / ARCH-05 MainWindow workspace surface coordinator",
+      "status": "accepted-with-limits",
+      "owner": "architect",
+      "created_at": "2026-08-10T09:00:00+08:00",
+      "acceptance_ids": ["D14-AC01", "S43"]
+    },
+    {
+      "id": "2026-08-10-d13-document-tab-surface",
+      "path": "docs/handoffs/2026-08-10-d13-document-tab-surface/handoff.md",
+      "delivery": "D13 / ARCH-04 MainWindow document-tab surface coordinator",
+      "status": "accepted-with-limits",
+      "owner": "architect",
+      "created_at": "2026-08-10T08:00:00+08:00",
+      "acceptance_ids": ["D13-AC01", "S42"]
+    },
+    {
+      "id": "2026-08-10-d12-command-surface-coordinator",
+      "path": "docs/handoffs/2026-08-10-d12-command-surface-coordinator/handoff.md",
+      "delivery": "D12 / ARCH-03 MainWindow command-surface coordinator",
+      "status": "accepted-with-limits",
+      "owner": "architect",
+      "created_at": "2026-08-10T07:00:00+08:00",
+      "acceptance_ids": ["D12-AC01", "S41"]
+    },
+    {
+      "id": "2026-08-10-d11-enterprise-composition-root",
+      "path": "docs/handoffs/2026-08-10-d11-enterprise-composition-root/handoff.md",
+      "delivery": "D11 / ARCH-01..02 enterprise architecture baseline and composition root",
+      "status": "accepted-with-limits",
+      "owner": "architect",
+      "created_at": "2026-08-10T06:00:00+08:00",
+      "acceptance_ids": ["D11-AC01", "S40"]
+    },
+    {
+      "id": "2026-08-10-d9-ui-14-command-palette-surface-rhythm",
+      "path": "docs/handoffs/2026-08-10-d9-ui-14-command-palette-surface-rhythm/handoff.md",
+      "delivery": "D9 / UI-14 command-palette hierarchy and mature surface rhythm",
+      "status": "accepted-with-limits",
+      "owner": "architect",
+      "created_at": "2026-08-10T05:00:00+08:00",
+      "acceptance_ids": ["D9-AC12", "S39"]
+    },
+    {
+      "id": "2026-08-10-d9-ui-13-findbar-contrast",
+      "path": "docs/handoffs/2026-08-10-d9-ui-13-findbar-contrast/handoff.md",
+      "delivery": "D9 / UI-13 FindBar action hierarchy and accent contrast",
+      "status": "accepted-with-limits",
+      "owner": "architect",
+      "created_at": "2026-08-10T04:27:51+08:00",
+      "acceptance_ids": ["D9-AC11", "S38"]
+    },
+    {
+      "id": "2026-08-10-d9-ui-12-action-hierarchy",
+      "path": "docs/handoffs/2026-08-10-d9-ui-12-action-hierarchy/handoff.md",
+      "delivery": "D9 / UI-12 dialog primary-action hierarchy",
+      "status": "accepted-with-limits",
+      "owner": "architect",
+      "created_at": "2026-08-10T05:00:00+08:00",
+      "acceptance_ids": ["D9-AC10", "S37"]
+    },
+    {
+      "id": "2026-08-10-d8-5-ledger-provenance-semantics",
+      "path": "docs/handoffs/2026-08-10-d8-5-ledger-provenance-semantics/handoff.md",
+      "delivery": "D8 / D8.5 live artifact-provenance ledger semantics",
+      "status": "accepted-with-limits",
+      "owner": "architect",
+      "created_at": "2026-08-10T04:05:00+08:00",
+      "acceptance_ids": ["D8-AC06", "S32"]
+    },
+    {
+      "id": "2026-08-10-d9-ui-11-state-clarity",
+      "path": "docs/handoffs/2026-08-10-d9-ui-11-state-clarity/handoff.md",
+      "delivery": "D9 / UI-11 visual state closure and focus clarity",
+      "status": "accepted-with-limits",
+      "owner": "architect",
+      "created_at": "2026-08-10T03:21:43+08:00",
+      "acceptance_ids": ["D9-AC09", "S36"]
+    },
+    {
+      "id": "2026-08-10-d7-4-bounded-read-budget",
+      "path": "docs/handoffs/2026-08-10-d7-4-bounded-read-budget/handoff.md",
+      "delivery": "D7 / D7.4 scan-time bounded workspace-search read budget",
+      "status": "accepted-with-limits",
+      "owner": "architect",
+      "created_at": "2026-08-10T02:30:24+08:00",
+      "acceptance_ids": ["D74-AC01", "D74-AC02", "D74-AC03", "D74-AC04", "S22"]
+    },
+    {
+      "id": "2026-08-10-d6-6-exact-probe-argv",
+      "path": "docs/handoffs/2026-08-10-d6-6-exact-probe-argv/handoff.md",
+      "delivery": "D6 / D6.6 exact probe-only host entry guard",
+      "status": "accepted-with-limits",
+      "owner": "architect",
+      "created_at": "2026-08-10T02:30:24+08:00",
+      "acceptance_ids": ["D6-AC06", "S19"]
+    },
+    {
+      "id": "2026-08-10-d9-ui-10-visual-hierarchy",
+      "path": "docs/handoffs/2026-08-10-d9-ui-10-visual-hierarchy/handoff.md",
+      "delivery": "D9 / UI-10 visual hierarchy and highlight states",
+      "status": "accepted-with-limits",
+      "owner": "architect",
+      "created_at": "2026-08-10T02:20:00+08:00",
+      "acceptance_ids": ["D9-AC08", "S35"]
+    },
+    {
+      "id": "2026-08-10-d9-ui-09-modern-kawaii-shell",
+      "path": "docs/handoffs/2026-08-10-d9-ui-09-modern-kawaii-shell/handoff.md",
+      "delivery": "D9 / UI-09 modern Sakura Pop and anime-cute shell",
+      "status": "accepted-with-limits",
+      "owner": "architect",
+      "created_at": "2026-08-10T01:56:00+08:00",
+      "acceptance_ids": ["D9-AC07", "S34"]
+    },
+    {
+      "id": "2026-08-10-d9-ui-08-localization-appearance",
+      "path": "docs/handoffs/2026-08-10-d9-ui-08-localization-appearance/handoff.md",
+      "delivery": "D9 / UI-08 localization, appearance preferences, and workspace file activation",
+      "status": "accepted-with-limits",
+      "owner": "architect",
+      "created_at": "2026-08-10T01:39:06+08:00",
+      "acceptance_ids": ["D9-AC06", "S33"]
+    },
+    {
+      "id": "2026-08-10-d6-6-wait-failure-mapping",
+      "path": "docs/handoffs/2026-08-10-d6-6-wait-failure-mapping/handoff.md",
+      "delivery": "D6 / D6.6 typed plugin-host wait-failure mapping",
+      "status": "accepted-with-limits",
+      "owner": "architect",
+      "created_at": "2026-08-10T00:55:39.7941681+08:00",
+      "acceptance_ids": ["D6-AC06", "S19"]
+    },
+    {
+      "id": "2026-08-10-d7-4-independent-review-window",
+      "path": "docs/handoffs/2026-08-10-d7-4-independent-review-window/handoff.md",
+      "delivery": "D7 / D7.4 independent source-review window",
+      "status": "in-progress",
+      "owner": "architect",
+      "created_at": "2026-08-10T00:52:09.8764864+08:00",
+      "acceptance_ids": ["D74-AC04", "S22"]
+    },
+    {
+      "id": "2026-08-10-d8-5-handoff-freshness-enforcement",
+      "path": "docs/handoffs/2026-08-10-d8-5-handoff-freshness-enforcement/handoff.md",
+      "delivery": "D8 / D8.5 human release-handoff freshness enforcement",
+      "status": "accepted-with-limits",
+      "owner": "architect",
+      "created_at": "2026-08-10T00:34:57.6478623+08:00",
+      "acceptance_ids": ["D8-AC06"]
+    },
+    {
+      "id": "2026-08-10-d6-6-independent-review-window",
+      "path": "docs/handoffs/2026-08-10-d6-6-independent-review-window/handoff.md",
+      "delivery": "D6 / D6.6 independent high-risk review window",
+      "status": "in-progress",
+      "owner": "architect",
+      "created_at": "2026-08-10T00:30:30.4664231+08:00",
+      "acceptance_ids": ["D6-AC06", "S19"]
+    },
+    {
+      "id": "2026-08-10-d8-5-current-handoff-identity",
+      "path": "docs/handoffs/2026-08-10-d8-5-current-handoff-identity/handoff.md",
+      "delivery": "D8 / D8.5 current release-handoff identity synchronization",
+      "status": "accepted-with-limits",
+      "owner": "architect",
+      "created_at": "2026-08-10T00:23:53.8461554+08:00",
+      "acceptance_ids": ["D8-AC06"]
+    },
+    {
+      "id": "2026-08-09-d7-3-measurement-cleanup",
+      "path": "docs/handoffs/2026-08-09-d7-3-measurement-cleanup/handoff.md",
+      "delivery": "D7 / D7.3 measured workload expansion; adjacent D7.4 identity audit",
+      "status": "in-progress",
+      "owner": "architect",
+      "created_at": "2026-08-09T23:55:25+08:00",
+      "acceptance_ids": ["D73-AC01", "D73-AC02", "D73-AC03", "D73-AC04", "D73-AC05", "D74-AC04"]
+    },
+    {
+      "id": "2026-08-09-d6-6-handle-conversion-fix",
+      "path": "docs/handoffs/2026-08-09-d6-6-handle-conversion-fix/handoff.md",
+      "delivery": "D6 / D6.6",
+      "status": "in-progress",
+      "owner": "architect",
+      "created_at": "2026-08-09T23:40:21+08:00",
+      "acceptance_ids": ["D6-AC06", "S19"]
+    },
+    {
+      "id": "2026-08-09-d8-notice-inventory-coverage",
+      "path": "docs/handoffs/2026-08-09-d8-notice-inventory-coverage/handoff.md",
+      "delivery": "D8 / D8.1 / D8-AC02",
+      "status": "accepted-with-limits",
+      "owner": "architect",
+      "created_at": "2026-08-09T23:29:25+08:00",
+      "acceptance_ids": ["D8-AC01", "D8-AC02", "S13", "D8-AC06"]
+    },
+    {
+      "id": "2026-08-09-d7-4-s22-status-closure",
+      "path": "docs/handoffs/2026-08-09-d7-4-s22-status-closure/handoff.md",
+      "delivery": "D7 / D7.4",
+      "status": "accepted-with-limits",
+      "owner": "architect",
+      "created_at": "2026-08-09T23:15:00+08:00",
+      "acceptance_ids": ["S22", "D74-AC01", "D74-AC02", "D74-AC03"]
+    },
+    {
+      "id": "2026-08-09-s21-s24-status-closure",
+      "path": "docs/handoffs/2026-08-09-s21-s24-status-closure/handoff.md",
+      "delivery": "D6.8 / D7.4.2",
+      "status": "accepted-with-limits",
+      "owner": "architect",
+      "created_at": "2026-08-09T23:10:00+08:00",
+      "acceptance_ids": ["S21", "S24", "D6-AC08", "D742-AC01"]
+    },
+    {
+      "id": "2026-08-09-d6-scenario-status-closure",
+      "path": "docs/handoffs/2026-08-09-d6-scenario-status-closure/handoff.md",
+      "delivery": "D6 / scenario status projection",
+      "status": "accepted-with-limits",
+      "owner": "architect",
+      "created_at": "2026-08-09T23:07:30+08:00",
+      "acceptance_ids": ["S15", "S16", "S17", "S18", "D6-AC02", "D6-AC03", "D6-AC04", "D6-AC05"]
+    },
+    {
+      "id": "2026-08-09-d6-7-static-closure",
+      "path": "docs/handoffs/2026-08-09-d6-7-static-closure/handoff.md",
+      "delivery": "D6 / D6.7",
+      "status": "accepted-with-limits",
+      "owner": "architect",
+      "created_at": "2026-08-09T23:04:00+08:00",
+      "acceptance_ids": ["D6-AC07", "S20"]
+    },
+    {
+      "id": "2026-08-09-d7-4-preview-boundary-fix",
+      "path": "docs/handoffs/2026-08-09-d7-4-preview-boundary-fix/handoff.md",
+      "delivery": "D7 / D7.4",
+      "status": "accepted-with-limits",
+      "owner": "architect",
+      "created_at": "2026-08-09T22:49:46+08:00",
+      "acceptance_ids": ["D74-AC01", "D74-AC02", "S22"]
+    },
+    {
+      "id": "2026-08-09-d7-4-static-criteria-closure",
+      "path": "docs/handoffs/2026-08-09-d7-4-static-criteria-closure/handoff.md",
+      "delivery": "D7 / D7.4",
+      "status": "accepted-with-limits",
+      "owner": "architect",
+      "created_at": "2026-08-09T22:40:34+08:00",
+      "acceptance_ids": ["D74-AC01", "D74-AC02", "D74-AC03", "S22"]
+    },
+    {
+      "id": "2026-08-09-d9-static-criteria-closure",
+      "path": "docs/handoffs/2026-08-09-d9-static-criteria-closure/handoff.md",
+      "delivery": "D9 / D9-AC01..04",
+      "status": "accepted-with-limits",
+      "owner": "architect",
+      "created_at": "2026-08-09T22:37:32+08:00",
+      "acceptance_ids": ["D9-AC01", "D9-AC02", "D9-AC03", "D9-AC04", "S26", "S27", "S28", "S29"]
+    },
+    {
+      "id": "2026-08-09-d6-6-current-source-audit",
+      "path": "docs/handoffs/2026-08-09-d6-6-current-source-audit/handoff.md",
+      "delivery": "D6 / D6.6",
+      "status": "in-progress",
+      "owner": "architect",
+      "created_at": "2026-08-09T22:27:28+08:00",
+      "acceptance_ids": ["D6-AC06", "S19", "S20"]
+    },
+    {
+      "id": "2026-08-09-d9-ui-07-independent-luna-review",
+      "path": "docs/handoffs/2026-08-09-d9-ui-07-independent-luna-review/handoff.md",
+      "delivery": "D9 / UI-07",
+      "status": "accepted-with-limits",
+      "owner": "architect",
+      "created_at": "2026-08-09T23:35:00+08:00",
+      "acceptance_ids": ["D9-AC02", "D9-AC03", "S27", "S28"]
+    },
+    {
+      "id": "2026-08-09-d7-4-cancellation-callback-contract",
+      "path": "docs/handoffs/2026-08-09-d7-4-cancellation-callback-contract/handoff.md",
+      "delivery": "D7 / D7.4",
+      "status": "in-progress",
+      "owner": "architect",
+      "created_at": "2026-08-09T23:10:00+08:00",
+      "acceptance_ids": ["D74-AC03", "S22"]
+    },
+    {
+      "id": "2026-08-09-d7-4-1-current-artifact-rebind",
+      "path": "docs/handoffs/2026-08-09-d7-4-1-current-artifact-rebind/handoff.md",
+      "delivery": "D7 / D7.4.1",
+      "status": "accepted-with-limits",
+      "owner": "architect",
+      "created_at": "2026-08-09T22:55:00+08:00",
+      "acceptance_ids": ["D741-AC01", "S23"]
+    },
+    {
+      "id": "2026-08-09-d6-8-fail-closed-follow-up",
+      "path": "docs/handoffs/2026-08-09-d6-8-fail-closed-follow-up/handoff.md",
+      "delivery": "D6 / D6.8",
+      "status": "accepted-with-limits",
+      "owner": "architect",
+      "created_at": "2026-08-09T22:35:00+08:00",
+      "acceptance_ids": ["D6-AC08", "S21"]
+    },
+    {
+      "id": "2026-08-09-d7-4-2-independent-luna-review",
+      "path": "docs/handoffs/2026-08-09-d7-4-2-independent-luna-review/handoff.md",
+      "delivery": "D7 / D7.4.2",
+      "status": "accepted-with-limits",
+      "owner": "architect",
+      "created_at": "2026-08-09T22:15:00+08:00",
+      "acceptance_ids": ["D742-AC01", "S24"]
+    },
+    {
+      "id": "2026-08-09-d7-4-1-diagnostic-artifact-binding",
+      "path": "docs/handoffs/2026-08-09-d7-4-1-diagnostic-artifact-binding/handoff.md",
+      "delivery": "D7 / D7.4.1",
+      "status": "accepted-with-limits",
+      "owner": "architect",
+      "created_at": "2026-08-09T21:38:13+08:00",
+      "acceptance_ids": ["D741-AC01", "S23"]
+    },
+    {
+      "id": "2026-08-09-d6-8-execution-gate-review",
+      "path": "docs/handoffs/2026-08-09-d6-8-execution-gate-review/handoff.md",
+      "delivery": "D6 / D6.8",
+      "status": "in-progress",
+      "owner": "architect",
+      "created_at": "2026-08-09T21:32:43+08:00",
+      "acceptance_ids": ["D6-AC08", "S21"]
+    },
+    {
+      "id": "2026-08-09-d6-7-containment-review",
+      "path": "docs/handoffs/2026-08-09-d6-7-containment-review/handoff.md",
+      "delivery": "D6 / D6.7",
+      "status": "in-progress",
+      "owner": "architect",
+      "created_at": "2026-08-09T21:32:01+08:00",
+      "acceptance_ids": ["D6-AC07", "S20", "S21"]
+    },
+    {
+      "id": "2026-08-09-d6-6-host-protocol-review",
+      "path": "docs/handoffs/2026-08-09-d6-6-host-protocol-review/handoff.md",
+      "delivery": "D6 / D6.6",
+      "status": "in-progress",
+      "owner": "architect",
+      "created_at": "2026-08-09T21:31:08+08:00",
+      "acceptance_ids": ["D6-AC06", "S19", "S20"]
+    },
+    {
+      "id": "2026-08-09-d6-5-enablement-review",
+      "path": "docs/handoffs/2026-08-09-d6-5-enablement-review/handoff.md",
+      "delivery": "D6 / D6.5",
+      "status": "accepted-with-limits",
+      "owner": "architect",
+      "created_at": "2026-08-09T21:25:46+08:00",
+      "acceptance_ids": ["D6-AC05", "S18"]
+    },
+    {
+      "id": "2026-08-09-d6-4-runtime-control-review",
+      "path": "docs/handoffs/2026-08-09-d6-4-runtime-control-review/handoff.md",
+      "delivery": "D6 / D6.4",
+      "status": "accepted-with-limits",
+      "owner": "architect",
+      "created_at": "2026-08-09T21:24:54+08:00",
+      "acceptance_ids": ["D6-AC04", "S16", "S17"]
+    },
+    {
+      "id": "2026-08-09-d6-3-approval-ledger-review",
+      "path": "docs/handoffs/2026-08-09-d6-3-approval-ledger-review/handoff.md",
+      "delivery": "D6 / D6.3",
+      "status": "accepted-with-limits",
+      "owner": "architect",
+      "created_at": "2026-08-09T21:24:02+08:00",
+      "acceptance_ids": ["D6-AC03", "S15"]
+    },
+    {
+      "id": "2026-08-09-d6-1-catalog-review",
+      "path": "docs/handoffs/2026-08-09-d6-1-catalog-review/handoff.md",
+      "delivery": "D6 / D6.1",
+      "status": "accepted-with-limits",
+      "owner": "architect",
+      "created_at": "2026-08-09T21:23:05+08:00",
+      "acceptance_ids": ["D6-AC01", "S11"]
+    },
+    {
+      "id": "2026-08-09-d6-2-shared-validator-length",
+      "path": "docs/handoffs/2026-08-09-d6-2-shared-validator-length/handoff.md",
+      "delivery": "D6 / D6.2",
+      "status": "accepted-with-limits",
+      "owner": "architect",
+      "created_at": "2026-08-09T21:20:48+08:00",
+      "acceptance_ids": ["D6-AC02", "S14"]
+    },
+    {
+      "id": "2026-08-09-d7-4-1-search-diagnostics",
+      "path": "docs/handoffs/2026-08-09-d7-4-1-search-diagnostics/handoff.md",
+      "delivery": "D7 / D7.4.1",
+      "status": "in-progress",
+      "owner": "architect",
+      "created_at": "2026-08-09T21:18:25+08:00",
+      "acceptance_ids": ["D741-AC01", "S23"]
+    },
+    {
+      "id": "2026-08-09-d10-handoff-status-consistency",
+      "path": "docs/handoffs/2026-08-09-d10-handoff-status-consistency/handoff.md",
+      "delivery": "D10 / GOV-02",
+      "status": "accepted-with-limits",
+      "owner": "architect",
+      "created_at": "2026-08-09T21:15:37+08:00",
+      "acceptance_ids": ["D10-AC01", "S30"]
+    },
+    {
+      "id": "2026-08-09-d8-6-manifest-completeness",
+      "path": "docs/handoffs/2026-08-09-d8-6-manifest-completeness/handoff.md",
+      "delivery": "D8 / D8.6",
+      "status": "accepted-with-limits",
+      "owner": "architect",
+      "created_at": "2026-08-09T22:25:00+08:00",
+      "acceptance_ids": ["D8-AC01", "D8-AC02", "D8-AC03", "S13", "S32"]
+    },
+    {
+      "id": "2026-08-09-d9-ui-07-accessibility-baseline",
+      "path": "docs/handoffs/2026-08-09-d9-ui-07-accessibility-baseline/handoff.md",
+      "delivery": "D9 / UI-07",
+      "status": "accepted-with-limits",
+      "owner": "architect",
+      "created_at": "2026-08-09T22:00:00+08:00",
+      "acceptance_ids": ["D9-AC02", "D9-AC03", "S27", "S28"]
+    },
+    {
+      "id": "2026-08-09-d6-6-pid-provenance",
+      "path": "docs/handoffs/2026-08-09-d6-6-pid-provenance/handoff.md",
+      "delivery": "D6 / D6.6",
+      "status": "accepted-with-limits",
+      "owner": "architect",
+      "created_at": "2026-08-09T21:35:00+08:00",
+      "acceptance_ids": ["D6-AC06", "D6-AC07", "S19", "S20"]
+    },
+    {
+      "id": "2026-08-09-d7-4-2-startup-cancel-guard",
+      "path": "docs/handoffs/2026-08-09-d7-4-2-startup-cancel-guard/handoff.md",
+      "delivery": "D7 / D7.4.2",
+      "status": "accepted-with-limits",
+      "owner": "architect",
+      "created_at": "2026-08-09T21:05:00+08:00",
+      "acceptance_ids": ["D742-AC01", "S24"]
+    },
+    {
+      "id": "2026-08-09-d8-5-handoff-freshness",
+      "path": "docs/handoffs/2026-08-09-d8-5-handoff-freshness/handoff.md",
+      "delivery": "D8 / D8.5",
+      "status": "accepted-with-limits",
+      "owner": "architect",
+      "created_at": "2026-08-09T20:45:00+08:00",
+      "acceptance_ids": ["S32", "D8-AC06"]
+    },
+    {
+      "id": "2026-08-09-ui-06-status-coverage",
+      "path": "docs/handoffs/2026-08-09-ui-06-status-coverage/handoff.md",
+      "delivery": "D9 / UI-06",
+      "status": "accepted-with-limits",
+      "owner": "architect",
+      "created_at": "2026-08-09T18:20:00+08:00",
+      "acceptance_ids": ["S31", "D9-AC05"]
+    },
+    {
+      "id": "2026-08-09-d7-5-1-independent-review",
+      "path": "docs/handoffs/2026-08-09-d7-5-1-independent-review/handoff.md",
+      "delivery": "D7 / D7.5.1",
+      "status": "accepted-with-limits",
+      "owner": "architect",
+      "created_at": "2026-08-09T16:00:00+08:00",
+      "acceptance_ids": ["D751-AC01", "S25"]
+    },
+    {
+      "id": "2026-08-09-ui-05-editor-canvas",
+      "path": "docs/handoffs/2026-08-09-ui-05-editor-canvas/handoff.md",
+      "delivery": "D9 / UI-05",
+      "status": "accepted-with-limits",
+      "owner": "architect",
+      "created_at": "2026-08-09T15:40:00+08:00",
+      "acceptance_ids": ["S29", "D9-AC04"]
+    },
+    {
+      "id": "2026-08-09-ui-04-status-rail",
+      "path": "docs/handoffs/2026-08-09-ui-04-status-rail/handoff.md",
+      "delivery": "D9 / UI-04",
+      "status": "accepted-with-limits",
+      "owner": "architect",
+      "created_at": "2026-08-09T15:30:00+08:00",
+      "acceptance_ids": ["S28", "D9-AC03"]
+    },
+    {
+      "id": "2026-08-09-ui-03-dialog-surfaces",
+      "path": "docs/handoffs/2026-08-09-ui-03-dialog-surfaces/handoff.md",
+      "delivery": "D9 / UI-03",
+      "status": "accepted-with-limits",
+      "owner": "architect",
+      "created_at": "2026-08-09T15:20:00+08:00",
+      "acceptance_ids": ["S27", "D9-AC02"]
+    },
+    {
+      "id": "2026-08-09-ui-02-command-rail",
+      "path": "docs/handoffs/2026-08-09-ui-02-command-rail/handoff.md",
+      "delivery": "D9 / UI-02",
+      "status": "accepted-with-limits",
+      "owner": "architect",
+      "created_at": "2026-08-09T15:10:00+08:00",
+      "acceptance_ids": ["S26", "D9-AC01"]
+    },
+    {
+      "id": "2026-08-09-d7-5-1-session-contract",
+      "path": "docs/handoffs/2026-08-09-d7-5-1-session-contract/handoff.md",
+      "delivery": "D7.5.1",
+      "status": "accepted-with-limits",
+      "owner": "architect",
+      "created_at": "2026-08-09T15:00:00+08:00",
+      "acceptance_ids": ["D751-AC01", "S25"]
+    },
+    {
+      "id": "2026-08-09-workflow-policy",
+      "path": "docs/handoffs/2026-08-09-workflow-policy/handoff.md",
+      "delivery": "D10",
+      "status": "accepted-with-limits",
+      "owner": "architect",
+      "created_at": "2026-08-09T00:00:00+08:00",
+      "acceptance_ids": ["S30", "D10-AC01"]
+    }
+  ]
+}

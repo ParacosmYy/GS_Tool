@@ -1,0 +1,86 @@
+{
+  "schema_version": "1.0",
+  "tool": "scripts/verify_clean_machine.ps1",
+  "generated_at_utc": "2026-08-09T05:40:25.8717421Z",
+  "status": "passed",
+  "environment_label": "unclassified-current-machine",
+  "clean_machine": false,
+  "clean_machine_attestation": "No clean-machine attestation supplied; this report is a current/unclassified machine baseline.",
+  "artifact": {
+    "path": "D:\\Workplace\\Agent_Workplace\\QuillForge\\QuillForge.exe",
+    "bytes": 38169860,
+    "sha256": "47E6EAAB0B24B1E784D678699B62430DFB82D68C50531911ABFAB0A3AA57227E",
+    "file_version": "0.1.0.0",
+    "product_version": "0.1.0.0"
+  },
+  "environment": {
+    "os": "Microsoft Windows 11 专业版",
+    "os_version": "10.0.26100",
+    "architecture": "x64-based PC",
+    "architecture_supported": true,
+    "powershell": "7.6.4"
+  },
+  "startup": {
+    "threshold_seconds": 5,
+    "elapsed_seconds": 5.264,
+    "launcher_pid": 31008,
+    "process_records": [
+      {
+        "process_id": 31008,
+        "parent_process_id": 93876,
+        "executable": "D:\\Workplace\\Agent_Workplace\\QuillForge\\QuillForge.exe"
+      },
+      {
+        "process_id": 28580,
+        "parent_process_id": 79068,
+        "executable": "D:\\Workplace\\Agent_Workplace\\QuillForge\\QuillForge.exe"
+      },
+      {
+        "process_id": 73672,
+        "parent_process_id": 31008,
+        "executable": "D:\\Workplace\\Agent_Workplace\\QuillForge\\QuillForge.exe"
+      },
+      {
+        "process_id": 8500,
+        "parent_process_id": 28580,
+        "executable": "D:\\Workplace\\Agent_Workplace\\QuillForge\\QuillForge.exe"
+      }
+    ],
+    "window_records": [
+      {
+        "process_id": 31008,
+        "title": "",
+        "executable": "D:\\Workplace\\Agent_Workplace\\QuillForge\\QuillForge.exe"
+      },
+      {
+        "process_id": 28580,
+        "title": "",
+        "executable": "D:\\Workplace\\Agent_Workplace\\QuillForge\\QuillForge.exe"
+      },
+      {
+        "process_id": 73672,
+        "title": "QuillForge",
+        "executable": "D:\\Workplace\\Agent_Workplace\\QuillForge\\QuillForge.exe"
+      },
+      {
+        "process_id": 8500,
+        "title": "QuillForge",
+        "executable": "D:\\Workplace\\Agent_Workplace\\QuillForge\\QuillForge.exe"
+      }
+    ],
+    "quillforge_window_found": true,
+    "architecture_supported": true
+  },
+  "cleanup": {
+    "exact_path_processes_removed": true,
+    "remaining_exact_path_processes": []
+  },
+  "interpretation": {
+    "claims": "Interactive startup identity and lifetime on the labeled Windows machine only.",
+    "unrun": [
+      "clean-machine attestation",
+      "cross-machine repeatability",
+      "interactive feature matrix beyond startup"
+    ]
+  }
+}

@@ -1,0 +1,65 @@
+﻿{
+    "schema_version":  "1.0",
+    "generated_at_utc":  "2026-08-12T15:51:04.1270931Z",
+    "decision":  "no-go",
+    "decision_reason":  "Mechanical handoff evidence is inconsistent; release gates remain open.",
+    "owner":  "QuillForge project",
+    "artifact":  {
+                     "path":  "QuillForge.exe",
+                     "bytes":  38602010,
+                     "sha256":  "68D86AA6FB5756AE0E28E737A0F2418DA98668DC442AFD2AB3FCBE110680070C"
+                 },
+    "release_manifest":  "dist/QuillForge.release.json",
+    "checks":  {
+                   "root_dist_identity_match":  true,
+                   "manifest_artifact_match":  true,
+                   "manifest_root_copy_match":  true,
+                   "manifest_notice_match":  true,
+                   "human_handoff_identity_match":  true,
+                   "notice_inventory_complete":  true,
+                   "manifest_source_provenance_explicit":  true,
+                   "file_associations_decision_explicit":  true,
+                   "version_resource_match":  true,
+                   "packaged_capture_runs_complete":  true,
+                   "packaged_report_artifact_match":  false,
+                   "source_repeat_safety_complete":  true,
+                   "support_owner_assigned":  true,
+                   "support_issue_route_declared":  true,
+                   "support_issue_route_exists":  true,
+                   "support_handoff_packet_exists":  true,
+                   "interactive_startup_report_consistent":  false,
+                   "startup_preflight_report_consistent":  false
+               },
+    "mechanical_failures":  [
+                                "packaged_report_artifact_match",
+                                "interactive_startup_report_consistent",
+                                "startup_preflight_report_consistent"
+                            ],
+    "evidence":  {
+                     "packaged_capture":  "docs/performance/packaged-capture-2026-08-09.json",
+                     "source_repeat":  "docs/performance/repeat-2026-08-09.json",
+                     "interactive_startup":  "docs/performance/interactive-startup-2026-08-09.json",
+                     "startup_preflight":  "docs/performance/clean-machine-preflight-2026-08-09.json",
+                     "notice":  "dist/NOTICE.md",
+                     "version":  "0.1.0.0",
+                     "source_revision":  "tree-sha256:2d1144c3be56e68fd7b2ed615caa7ffbe807a0104f0a712995605b7975c711cf",
+                     "file_associations":  "not-configured",
+                     "support_owner":  "Project Manager (QuillForge)",
+                     "support_issue_route":  "docs/support/ISSUES.md",
+                     "support_handoff_packet":  "docs/support/HANDOFF.md",
+                     "support_handoff_packet_exists":  true
+                 },
+    "open_gates":  [
+                       "signing:not-signed",
+                       "installer:not-an-installer",
+                       "update:not-implemented",
+                       "file-associations:not-configured",
+                       "support:handoff-pending",
+                       "clean-machine:environment_pending",
+                       "legal-notice-clearance:pending",
+                       "permission-and-disk-pressure:unrun",
+                       "hard-power-durability:unrun",
+                       "cross-machine-repeatability:unrun"
+                   ],
+    "support_boundary":  "No large-file support range, native-memory ceiling, clean-machine guarantee, disk-pressure guarantee, or hard-power durability claim is approved."
+}

@@ -1,0 +1,31 @@
+.venv/
+__pycache__/
+*.py[cod]
+.ruff_cache/
+.mypy_cache/
+.pytest_cache/
+.coverage
+htmlcov/
+build/
+dist/
+*.egg-info/
+.idea/
+.vscode/
+*.user
+*.userosscache
+*.suo
+*.pdb
+*.log
+
+# Local-only configuration and generated PyInstaller files.
+.env
+*.spec.bak
+
+# Packaged binaries produced by PyInstaller (do not commit build artifacts).
+QuillForge.exe
+*.exe
+
+# Machine-specific runtime diagnostics and reports.
+.diagnostics-*
+reports/
+

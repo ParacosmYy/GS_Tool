@@ -1,0 +1,4 @@
+interface:
+  display_name: "QuillForge Enterprise Architecture"
+  short_description: "Keep QuillForge modular, contract-driven, and evidence-backed"
+  default_prompt: "Use $quillforge-enterprise-architecture to plan and implement an incremental enterprise architecture slice with explicit boundaries, ADRs, reviews, and verification."

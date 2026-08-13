@@ -1,0 +1,92 @@
+{
+  "schema_version": "1.0",
+  "project": "QuillForge",
+  "owner": "architect",
+  "primary_agent": "architect",
+  "required_roles": [
+    "architect",
+    "project-manager",
+    "product",
+    "developer-1",
+    "developer-2",
+    "qa"
+  ],
+  "child_routing": {
+    "default": {
+      "route": "luna_max",
+      "model": "gpt-5.6-luna",
+      "reasoning_effort": "max",
+      "service_tier": "Fast"
+    },
+    "escalations": [
+      {
+        "route": "terra_max",
+        "model": "gpt-5.6-terra",
+        "reasoning_effort": "max",
+        "service_tier": "Fast",
+        "only_when": [
+          "complex call-chain trace",
+          "cross-module design tradeoff",
+          "concurrency/safety analysis",
+          "high-risk review unresolved by Luna"
+        ]
+      },
+      {
+        "route": "sol_medium",
+        "model": "gpt-5.6-sol",
+        "reasoning_effort": "medium",
+        "service_tier": "Fast",
+        "only_when": [
+          "hardest unresolved system-wide decision",
+          "ambiguous safety-critical failure",
+          "final adversarial review after Terra evidence is insufficient"
+        ]
+      }
+    ],
+    "allowed_routes": ["luna_max", "terra_max", "sol_medium"]
+  },
+  "checkout": {
+    "current_local_only": true,
+    "worktree_forbidden": true,
+    "single_shared_checkout_writer": true,
+    "parent_integrates": true,
+    "child_agents_read_only_by_default": true
+  },
+  "verification": {
+    "unit_tests_by_default": false,
+    "test_assets_by_default": false,
+    "static_checks": ["scripts/check.ps1"],
+    "package_when_artifact_relevant": true,
+    "parent_owns_final_verification": true
+  },
+  "launch_policy": {
+    "software_start_allowed": false,
+    "qt_window_allowed": false,
+    "requires_explicit_user_reversal": true,
+    "static_build_allowed": true,
+    "runtime_visual_review": "user-owned-and-unrun",
+    "runtime_startup_review": "user-owned-and-unrun"
+  },
+  "handoff": {
+    "required": true,
+    "file_name": "handoff.md",
+    "root": "docs/handoffs",
+    "template": "docs/handoffs/HANDOFF_TEMPLATE.md",
+    "index": "docs/handoffs/index.json",
+    "must_update_delivery_register": true,
+    "required_sections": [
+      "## User outcome",
+      "## Scope and boundaries",
+      "## Team roles and ownership",
+      "## Changed files and modules",
+      "## Decisions and constraints",
+      "## Verification commands and results",
+      "## Unrun checks and reason",
+      "## Known risks and limits",
+      "## Acceptance and evidence IDs",
+      "## Next owner and next action",
+      "## Artifact information",
+      "## Disposition"
+    ]
+  }
+}

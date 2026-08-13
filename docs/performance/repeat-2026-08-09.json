@@ -1,0 +1,805 @@
+{
+  "tool": "scripts/repeat_measure.ps1",
+  "repeat_count": 3,
+  "artifact": {
+    "path": "D:\\Workplace\\Agent_Workplace\\QuillForge\\QuillForge.exe",
+    "bytes": 38152741,
+    "sha256": "2c4ab50f0d77dd42617c430660817d8e234a44904f60a97c3e027f98628c03b1"
+  },
+  "runs": [
+    {
+      "tool": "scripts/measure.ps1",
+      "python": "3.12.13",
+      "platform": "Windows-11-10.0.26100-SP0",
+      "execution": "source Python path with Qt offscreen; not a packaged-EXE performance run",
+      "artifact": {
+        "path": "D:\\Workplace\\Agent_Workplace\\QuillForge\\QuillForge.exe",
+        "bytes": 38152741,
+        "sha256": "2c4ab50f0d77dd42617c430660817d8e234a44904f60a97c3e027f98628c03b1"
+      },
+      "scope": {
+        "small_file_bytes": 1200000,
+        "long_line_file_bytes": 1048586,
+        "search_text_bytes": 1050000,
+        "replace_match_count": 1000,
+        "editor_safety_probe_workloads": [
+          "cooperative Replace All cancellation after mutation",
+          "Replace All match-limit preflight",
+          "stale recovery capture after content-version change"
+        ],
+        "recovery_channel_queue_chunks": 64,
+        "recovery_channel_queue_bytes": 1048576,
+        "recovery_capture_input_lines": 150000,
+        "recovery_capture_character_chunk": 16384,
+        "capture_workload_matrix": [
+          "ascii-lf-64k",
+          "ascii-crlf-256k",
+          "unicode-lf-1m",
+          "long-line-lf-1m"
+        ],
+        "capture_event_loop_probe_bytes": 16777232,
+        "recovery_text_bytes": 1050000
+      },
+      "measurements": {
+        "file_load_small": {
+          "elapsed_ms": 12.367,
+          "python_peak_bytes": 3451185
+        },
+        "file_load_long_line": {
+          "elapsed_ms": 10.829,
+          "python_peak_bytes": 3146973
+        },
+        "file_save_small": {
+          "elapsed_ms": 5.932,
+          "python_peak_bytes": 2417756
+        },
+        "editor_find_literal": {
+          "elapsed_ms": 0.088,
+          "python_peak_bytes": 104
+        },
+        "editor_replace_all_cooperative": {
+          "elapsed_ms": 58.632,
+          "python_peak_bytes": 708,
+          "result": {
+            "phase": "completed",
+            "count": 1000,
+            "slices": 11
+          }
+        },
+        "bounded_recovery_channel": {
+          "elapsed_ms": 0.823,
+          "python_peak_bytes": 12785,
+          "result": {
+            "accepted_first": true,
+            "accepted_second": true,
+            "rejected_when_full": true,
+            "queued_before_consume": {
+              "chunks": 2,
+              "bytes": 32
+            },
+            "finish_state": "finished",
+            "consumer_stopped": true,
+            "round_trip": true,
+            "abort_requested": true,
+            "abort_state": "aborted",
+            "abort_consumer_stopped": true,
+            "abort_error_type": "RecoveryChannelAborted"
+          }
+        },
+        "editor_safety_probes": {
+          "elapsed_ms": 151.823,
+          "python_peak_bytes": 18134006,
+          "result": {
+            "cancellation": {
+              "phase_before_cancel": "replacing",
+              "phase_after_cancel": "cancelled",
+              "mutated_before_cancel": true,
+              "rollback_succeeded": true,
+              "text_restored": true
+            },
+            "limit": {
+              "phase": "limit_exceeded",
+              "count": 11,
+              "limit": 10,
+              "text_unchanged": true
+            },
+            "stale_capture": {
+              "capture_started": true,
+              "partial_before_edit": true,
+              "content_version_changed": true,
+              "job_discarded": true,
+              "session_phase": "cancelled",
+              "inflight_cleared": true,
+              "worker_terminal": true,
+              "snapshot_files": 0,
+              "temporary_files": 0
+            }
+          }
+        },
+        "bounded_recovery_handoff": {
+          "elapsed_ms": 65.539,
+          "python_peak_bytes": 7588387,
+          "result": {
+            "phase": "committed",
+            "round_trip": true,
+            "captured_bytes": 2250000,
+            "expected_bytes": 2250000,
+            "queue_peak_chunks": 64,
+            "queue_peak_bytes": 1048576,
+            "queue_max_chunks": 64,
+            "queue_max_bytes": 1048576,
+            "channel_state": "finished",
+            "worker_terminal": true,
+            "final_snapshot_files": 1,
+            "temporary_files": 0
+          }
+        },
+        "editor_recovery_capture_cooperative": {
+          "elapsed_ms": 4.272,
+          "python_peak_bytes": 1053897,
+          "result": {
+            "phase": "completed",
+            "captured_bytes": 1050000,
+            "total_bytes": 1050000,
+            "chunks": 65,
+            "slices": 1
+          }
+        },
+        "editor_recovery_capture_workload_matrix": {
+          "elapsed_ms": 43.551,
+          "python_peak_bytes": 9292977,
+          "result": [
+            {
+              "name": "ascii-lf-64k",
+              "encoding": "utf-8",
+              "requested_line_ending": "LF",
+              "actual_line_endings": {
+                "CRLF": 0,
+                "LF": 10000,
+                "CR": 0
+              },
+              "input_bytes": 60000,
+              "input_characters": 60000,
+              "captured_bytes": 60000,
+              "chunks": 4,
+              "slices": 1,
+              "round_trip": true
+            },
+            {
+              "name": "ascii-crlf-256k",
+              "encoding": "utf-8",
+              "requested_line_ending": "CRLF",
+              "actual_line_endings": {
+                "CRLF": 30000,
+                "LF": 0,
+                "CR": 0
+              },
+              "input_bytes": 180000,
+              "input_characters": 180000,
+              "captured_bytes": 180000,
+              "chunks": 11,
+              "slices": 1,
+              "round_trip": true
+            },
+            {
+              "name": "unicode-lf-1m",
+              "encoding": "utf-8",
+              "requested_line_ending": "LF",
+              "actual_line_endings": {
+                "CRLF": 0,
+                "LF": 100000,
+                "CR": 0
+              },
+              "input_bytes": 1100000,
+              "input_characters": 400000,
+              "captured_bytes": 1100000,
+              "chunks": 25,
+              "slices": 1,
+              "round_trip": true
+            },
+            {
+              "name": "long-line-lf-1m",
+              "encoding": "utf-8",
+              "requested_line_ending": "LF",
+              "actual_line_endings": {
+                "CRLF": 0,
+                "LF": 1,
+                "CR": 0
+              },
+              "input_bytes": 1048577,
+              "input_characters": 1048577,
+              "captured_bytes": 1048577,
+              "chunks": 65,
+              "slices": 1,
+              "round_trip": true
+            }
+          ]
+        },
+        "editor_recovery_capture_event_loop_probe": {
+          "elapsed_ms": 146.321,
+          "python_peak_bytes": 50388963,
+          "result": {
+            "phase": "completed",
+            "input_bytes": 16777232,
+            "capture_chunks": 1025,
+            "heartbeat_samples": 8,
+            "max_heartbeat_gap_ms": 11.772,
+            "memory_samples": 17,
+            "memory_peak": {
+              "working_set_bytes": 127414272,
+              "peak_working_set_bytes": 223207424,
+              "private_bytes": 102449152
+            }
+          }
+        },
+        "recovery_snapshot_write": {
+          "elapsed_ms": 4.907,
+          "python_peak_bytes": 2417285
+        },
+        "recovery_snapshot_chunk_write": {
+          "elapsed_ms": 5.079,
+          "python_peak_bytes": 69146
+        },
+        "recovery_chunk_write_failure_probe": {
+          "elapsed_ms": 11.192,
+          "python_peak_bytes": 19140,
+          "result": {
+            "failure_mode": "injected_mid_stream",
+            "permission_or_disk_pressure": false,
+            "error_type": "RuntimeError",
+            "final_snapshot_preserved": true,
+            "final_snapshot_files": 1,
+            "temporary_files": 0,
+            "source_dirty_after_failure": true,
+            "retry_remains_eligible": true
+          }
+        }
+      },
+      "interpretation": {
+        "claims": "machine baseline only; not a product support claim",
+        "memory": "python_peak_bytes is the tracemalloc peak; memory_peak is a source/offscreen process working-set/private-bytes sample, not a product support limit",
+        "unrun": [
+          "interactive clean-machine Windows startup",
+          "disk-full and permission pressure",
+          "power-loss durability",
+          "multi-window contention",
+          "files larger than the measured inputs",
+          "packaged-EXE capture performance"
+        ]
+      }
+    },
+    {
+      "tool": "scripts/measure.ps1",
+      "python": "3.12.13",
+      "platform": "Windows-11-10.0.26100-SP0",
+      "execution": "source Python path with Qt offscreen; not a packaged-EXE performance run",
+      "artifact": {
+        "path": "D:\\Workplace\\Agent_Workplace\\QuillForge\\QuillForge.exe",
+        "bytes": 38152741,
+        "sha256": "2c4ab50f0d77dd42617c430660817d8e234a44904f60a97c3e027f98628c03b1"
+      },
+      "scope": {
+        "small_file_bytes": 1200000,
+        "long_line_file_bytes": 1048586,
+        "search_text_bytes": 1050000,
+        "replace_match_count": 1000,
+        "editor_safety_probe_workloads": [
+          "cooperative Replace All cancellation after mutation",
+          "Replace All match-limit preflight",
+          "stale recovery capture after content-version change"
+        ],
+        "recovery_channel_queue_chunks": 64,
+        "recovery_channel_queue_bytes": 1048576,
+        "recovery_capture_input_lines": 150000,
+        "recovery_capture_character_chunk": 16384,
+        "capture_workload_matrix": [
+          "ascii-lf-64k",
+          "ascii-crlf-256k",
+          "unicode-lf-1m",
+          "long-line-lf-1m"
+        ],
+        "capture_event_loop_probe_bytes": 16777232,
+        "recovery_text_bytes": 1050000
+      },
+      "measurements": {
+        "file_load_small": {
+          "elapsed_ms": 15.226,
+          "python_peak_bytes": 3451185
+        },
+        "file_load_long_line": {
+          "elapsed_ms": 10.08,
+          "python_peak_bytes": 3146973
+        },
+        "file_save_small": {
+          "elapsed_ms": 10.246,
+          "python_peak_bytes": 2417756
+        },
+        "editor_find_literal": {
+          "elapsed_ms": 0.084,
+          "python_peak_bytes": 104
+        },
+        "editor_replace_all_cooperative": {
+          "elapsed_ms": 61.905,
+          "python_peak_bytes": 708,
+          "result": {
+            "phase": "completed",
+            "count": 1000,
+            "slices": 12
+          }
+        },
+        "bounded_recovery_channel": {
+          "elapsed_ms": 0.939,
+          "python_peak_bytes": 12785,
+          "result": {
+            "accepted_first": true,
+            "accepted_second": true,
+            "rejected_when_full": true,
+            "queued_before_consume": {
+              "chunks": 2,
+              "bytes": 32
+            },
+            "finish_state": "finished",
+            "consumer_stopped": true,
+            "round_trip": true,
+            "abort_requested": true,
+            "abort_state": "aborted",
+            "abort_consumer_stopped": true,
+            "abort_error_type": "RecoveryChannelAborted"
+          }
+        },
+        "editor_safety_probes": {
+          "elapsed_ms": 160.557,
+          "python_peak_bytes": 18134006,
+          "result": {
+            "cancellation": {
+              "phase_before_cancel": "replacing",
+              "phase_after_cancel": "cancelled",
+              "mutated_before_cancel": true,
+              "rollback_succeeded": true,
+              "text_restored": true
+            },
+            "limit": {
+              "phase": "limit_exceeded",
+              "count": 11,
+              "limit": 10,
+              "text_unchanged": true
+            },
+            "stale_capture": {
+              "capture_started": true,
+              "partial_before_edit": true,
+              "content_version_changed": true,
+              "job_discarded": true,
+              "session_phase": "cancelled",
+              "inflight_cleared": true,
+              "worker_terminal": true,
+              "snapshot_files": 0,
+              "temporary_files": 0
+            }
+          }
+        },
+        "bounded_recovery_handoff": {
+          "elapsed_ms": 62.377,
+          "python_peak_bytes": 7588387,
+          "result": {
+            "phase": "committed",
+            "round_trip": true,
+            "captured_bytes": 2250000,
+            "expected_bytes": 2250000,
+            "queue_peak_chunks": 64,
+            "queue_peak_bytes": 1048576,
+            "queue_max_chunks": 64,
+            "queue_max_bytes": 1048576,
+            "channel_state": "finished",
+            "worker_terminal": true,
+            "final_snapshot_files": 1,
+            "temporary_files": 0
+          }
+        },
+        "editor_recovery_capture_cooperative": {
+          "elapsed_ms": 4.271,
+          "python_peak_bytes": 1053897,
+          "result": {
+            "phase": "completed",
+            "captured_bytes": 1050000,
+            "total_bytes": 1050000,
+            "chunks": 65,
+            "slices": 1
+          }
+        },
+        "editor_recovery_capture_workload_matrix": {
+          "elapsed_ms": 45.562,
+          "python_peak_bytes": 9292977,
+          "result": [
+            {
+              "name": "ascii-lf-64k",
+              "encoding": "utf-8",
+              "requested_line_ending": "LF",
+              "actual_line_endings": {
+                "CRLF": 0,
+                "LF": 10000,
+                "CR": 0
+              },
+              "input_bytes": 60000,
+              "input_characters": 60000,
+              "captured_bytes": 60000,
+              "chunks": 4,
+              "slices": 1,
+              "round_trip": true
+            },
+            {
+              "name": "ascii-crlf-256k",
+              "encoding": "utf-8",
+              "requested_line_ending": "CRLF",
+              "actual_line_endings": {
+                "CRLF": 30000,
+                "LF": 0,
+                "CR": 0
+              },
+              "input_bytes": 180000,
+              "input_characters": 180000,
+              "captured_bytes": 180000,
+              "chunks": 11,
+              "slices": 1,
+              "round_trip": true
+            },
+            {
+              "name": "unicode-lf-1m",
+              "encoding": "utf-8",
+              "requested_line_ending": "LF",
+              "actual_line_endings": {
+                "CRLF": 0,
+                "LF": 100000,
+                "CR": 0
+              },
+              "input_bytes": 1100000,
+              "input_characters": 400000,
+              "captured_bytes": 1100000,
+              "chunks": 25,
+              "slices": 1,
+              "round_trip": true
+            },
+            {
+              "name": "long-line-lf-1m",
+              "encoding": "utf-8",
+              "requested_line_ending": "LF",
+              "actual_line_endings": {
+                "CRLF": 0,
+                "LF": 1,
+                "CR": 0
+              },
+              "input_bytes": 1048577,
+              "input_characters": 1048577,
+              "captured_bytes": 1048577,
+              "chunks": 65,
+              "slices": 1,
+              "round_trip": true
+            }
+          ]
+        },
+        "editor_recovery_capture_event_loop_probe": {
+          "elapsed_ms": 151.979,
+          "python_peak_bytes": 50389643,
+          "result": {
+            "phase": "completed",
+            "input_bytes": 16777232,
+            "capture_chunks": 1025,
+            "heartbeat_samples": 9,
+            "max_heartbeat_gap_ms": 12.077,
+            "memory_samples": 19,
+            "memory_peak": {
+              "working_set_bytes": 127655936,
+              "peak_working_set_bytes": 222339072,
+              "private_bytes": 102690816
+            }
+          }
+        },
+        "recovery_snapshot_write": {
+          "elapsed_ms": 5.901,
+          "python_peak_bytes": 2417285
+        },
+        "recovery_snapshot_chunk_write": {
+          "elapsed_ms": 5.591,
+          "python_peak_bytes": 69146
+        },
+        "recovery_chunk_write_failure_probe": {
+          "elapsed_ms": 11.112,
+          "python_peak_bytes": 19140,
+          "result": {
+            "failure_mode": "injected_mid_stream",
+            "permission_or_disk_pressure": false,
+            "error_type": "RuntimeError",
+            "final_snapshot_preserved": true,
+            "final_snapshot_files": 1,
+            "temporary_files": 0,
+            "source_dirty_after_failure": true,
+            "retry_remains_eligible": true
+          }
+        }
+      },
+      "interpretation": {
+        "claims": "machine baseline only; not a product support claim",
+        "memory": "python_peak_bytes is the tracemalloc peak; memory_peak is a source/offscreen process working-set/private-bytes sample, not a product support limit",
+        "unrun": [
+          "interactive clean-machine Windows startup",
+          "disk-full and permission pressure",
+          "power-loss durability",
+          "multi-window contention",
+          "files larger than the measured inputs",
+          "packaged-EXE capture performance"
+        ]
+      }
+    },
+    {
+      "tool": "scripts/measure.ps1",
+      "python": "3.12.13",
+      "platform": "Windows-11-10.0.26100-SP0",
+      "execution": "source Python path with Qt offscreen; not a packaged-EXE performance run",
+      "artifact": {
+        "path": "D:\\Workplace\\Agent_Workplace\\QuillForge\\QuillForge.exe",
+        "bytes": 38152741,
+        "sha256": "2c4ab50f0d77dd42617c430660817d8e234a44904f60a97c3e027f98628c03b1"
+      },
+      "scope": {
+        "small_file_bytes": 1200000,
+        "long_line_file_bytes": 1048586,
+        "search_text_bytes": 1050000,
+        "replace_match_count": 1000,
+        "editor_safety_probe_workloads": [
+          "cooperative Replace All cancellation after mutation",
+          "Replace All match-limit preflight",
+          "stale recovery capture after content-version change"
+        ],
+        "recovery_channel_queue_chunks": 64,
+        "recovery_channel_queue_bytes": 1048576,
+        "recovery_capture_input_lines": 150000,
+        "recovery_capture_character_chunk": 16384,
+        "capture_workload_matrix": [
+          "ascii-lf-64k",
+          "ascii-crlf-256k",
+          "unicode-lf-1m",
+          "long-line-lf-1m"
+        ],
+        "capture_event_loop_probe_bytes": 16777232,
+        "recovery_text_bytes": 1050000
+      },
+      "measurements": {
+        "file_load_small": {
+          "elapsed_ms": 12.891,
+          "python_peak_bytes": 3451185
+        },
+        "file_load_long_line": {
+          "elapsed_ms": 10.459,
+          "python_peak_bytes": 3146973
+        },
+        "file_save_small": {
+          "elapsed_ms": 10.104,
+          "python_peak_bytes": 2417756
+        },
+        "editor_find_literal": {
+          "elapsed_ms": 0.085,
+          "python_peak_bytes": 104
+        },
+        "editor_replace_all_cooperative": {
+          "elapsed_ms": 58.344,
+          "python_peak_bytes": 708,
+          "result": {
+            "phase": "completed",
+            "count": 1000,
+            "slices": 11
+          }
+        },
+        "bounded_recovery_channel": {
+          "elapsed_ms": 0.909,
+          "python_peak_bytes": 12785,
+          "result": {
+            "accepted_first": true,
+            "accepted_second": true,
+            "rejected_when_full": true,
+            "queued_before_consume": {
+              "chunks": 2,
+              "bytes": 32
+            },
+            "finish_state": "finished",
+            "consumer_stopped": true,
+            "round_trip": true,
+            "abort_requested": true,
+            "abort_state": "aborted",
+            "abort_consumer_stopped": true,
+            "abort_error_type": "RecoveryChannelAborted"
+          }
+        },
+        "editor_safety_probes": {
+          "elapsed_ms": 162.212,
+          "python_peak_bytes": 18134006,
+          "result": {
+            "cancellation": {
+              "phase_before_cancel": "replacing",
+              "phase_after_cancel": "cancelled",
+              "mutated_before_cancel": true,
+              "rollback_succeeded": true,
+              "text_restored": true
+            },
+            "limit": {
+              "phase": "limit_exceeded",
+              "count": 11,
+              "limit": 10,
+              "text_unchanged": true
+            },
+            "stale_capture": {
+              "capture_started": true,
+              "partial_before_edit": true,
+              "content_version_changed": true,
+              "job_discarded": true,
+              "session_phase": "cancelled",
+              "inflight_cleared": true,
+              "worker_terminal": true,
+              "snapshot_files": 0,
+              "temporary_files": 0
+            }
+          }
+        },
+        "bounded_recovery_handoff": {
+          "elapsed_ms": 72.089,
+          "python_peak_bytes": 7588387,
+          "result": {
+            "phase": "committed",
+            "round_trip": true,
+            "captured_bytes": 2250000,
+            "expected_bytes": 2250000,
+            "queue_peak_chunks": 64,
+            "queue_peak_bytes": 1048576,
+            "queue_max_chunks": 64,
+            "queue_max_bytes": 1048576,
+            "channel_state": "finished",
+            "worker_terminal": true,
+            "final_snapshot_files": 1,
+            "temporary_files": 0
+          }
+        },
+        "editor_recovery_capture_cooperative": {
+          "elapsed_ms": 4.376,
+          "python_peak_bytes": 1053897,
+          "result": {
+            "phase": "completed",
+            "captured_bytes": 1050000,
+            "total_bytes": 1050000,
+            "chunks": 65,
+            "slices": 1
+          }
+        },
+        "editor_recovery_capture_workload_matrix": {
+          "elapsed_ms": 43.695,
+          "python_peak_bytes": 9292977,
+          "result": [
+            {
+              "name": "ascii-lf-64k",
+              "encoding": "utf-8",
+              "requested_line_ending": "LF",
+              "actual_line_endings": {
+                "CRLF": 0,
+                "LF": 10000,
+                "CR": 0
+              },
+              "input_bytes": 60000,
+              "input_characters": 60000,
+              "captured_bytes": 60000,
+              "chunks": 4,
+              "slices": 1,
+              "round_trip": true
+            },
+            {
+              "name": "ascii-crlf-256k",
+              "encoding": "utf-8",
+              "requested_line_ending": "CRLF",
+              "actual_line_endings": {
+                "CRLF": 30000,
+                "LF": 0,
+                "CR": 0
+              },
+              "input_bytes": 180000,
+              "input_characters": 180000,
+              "captured_bytes": 180000,
+              "chunks": 11,
+              "slices": 1,
+              "round_trip": true
+            },
+            {
+              "name": "unicode-lf-1m",
+              "encoding": "utf-8",
+              "requested_line_ending": "LF",
+              "actual_line_endings": {
+                "CRLF": 0,
+                "LF": 100000,
+                "CR": 0
+              },
+              "input_bytes": 1100000,
+              "input_characters": 400000,
+              "captured_bytes": 1100000,
+              "chunks": 25,
+              "slices": 1,
+              "round_trip": true
+            },
+            {
+              "name": "long-line-lf-1m",
+              "encoding": "utf-8",
+              "requested_line_ending": "LF",
+              "actual_line_endings": {
+                "CRLF": 0,
+                "LF": 1,
+                "CR": 0
+              },
+              "input_bytes": 1048577,
+              "input_characters": 1048577,
+              "captured_bytes": 1048577,
+              "chunks": 65,
+              "slices": 1,
+              "round_trip": true
+            }
+          ]
+        },
+        "editor_recovery_capture_event_loop_probe": {
+          "elapsed_ms": 143.696,
+          "python_peak_bytes": 50389643,
+          "result": {
+            "phase": "completed",
+            "input_bytes": 16777232,
+            "capture_chunks": 1025,
+            "heartbeat_samples": 9,
+            "max_heartbeat_gap_ms": 12.866,
+            "memory_samples": 19,
+            "memory_peak": {
+              "working_set_bytes": 127369216,
+              "peak_working_set_bytes": 222281728,
+              "private_bytes": 102457344
+            }
+          }
+        },
+        "recovery_snapshot_write": {
+          "elapsed_ms": 9.704,
+          "python_peak_bytes": 2417285
+        },
+        "recovery_snapshot_chunk_write": {
+          "elapsed_ms": 5.166,
+          "python_peak_bytes": 69146
+        },
+        "recovery_chunk_write_failure_probe": {
+          "elapsed_ms": 12.049,
+          "python_peak_bytes": 19140,
+          "result": {
+            "failure_mode": "injected_mid_stream",
+            "permission_or_disk_pressure": false,
+            "error_type": "RuntimeError",
+            "final_snapshot_preserved": true,
+            "final_snapshot_files": 1,
+            "temporary_files": 0,
+            "source_dirty_after_failure": true,
+            "retry_remains_eligible": true
+          }
+        }
+      },
+      "interpretation": {
+        "claims": "machine baseline only; not a product support claim",
+        "memory": "python_peak_bytes is the tracemalloc peak; memory_peak is a source/offscreen process working-set/private-bytes sample, not a product support limit",
+        "unrun": [
+          "interactive clean-machine Windows startup",
+          "disk-full and permission pressure",
+          "power-loss durability",
+          "multi-window contention",
+          "files larger than the measured inputs",
+          "packaged-EXE capture performance"
+        ]
+      }
+    }
+  ],
+  "interpretation": {
+    "claims": "Repeated source/offscreen machine baseline only; not a product support claim.",
+    "unrun": [
+      "packaged-EXE capture performance",
+      "clean interactive Windows startup",
+      "disk-full and permission pressure",
+      "power-loss durability",
+      "multi-window contention",
+      "files larger than the measured inputs"
+    ]
+  }
+}

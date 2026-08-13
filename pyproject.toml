@@ -1,0 +1,39 @@
+[project]
+name = "quillforge"
+version = "0.1.0"
+description = "An extensible Windows-first text and code editor."
+readme = "README.md"
+requires-python = ">=3.12,<3.13"
+dependencies = [
+    "PyQt6>=6.10,<7",
+    "PyQt6-QScintilla>=2.14,<3",
+]
+
+[project.scripts]
+quillforge = "quillforge.__main__:main"
+
+[dependency-groups]
+dev = [
+    "pyinstaller>=6.21,<7",
+    "ruff>=0.14,<1",
+]
+
+[build-system]
+requires = ["hatchling>=1.27,<2"]
+build-backend = "hatchling.build"
+
+[tool.uv]
+default-groups = ["dev"]
+
+[tool.ruff]
+target-version = "py312"
+line-length = 100
+src = ["src", "scripts"]
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "UP", "B"]
+
+[tool.ruff.format]
+quote-style = "double"
+indent-style = "space"
+

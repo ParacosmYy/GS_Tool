@@ -1,0 +1,4 @@
+interface:
+  display_name: "QuillForge UI Visual Quality"
+  short_description: "Improve readable modern kawaii Qt UI states"
+  default_prompt: "Use $quillforge-ui-visual-quality to improve QuillForge presentation code with readable hierarchy, centralized QSS, contrast checks, and no-launch evidence."
